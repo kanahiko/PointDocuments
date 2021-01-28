@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\work\PointDocuments\PointDocuments\obj\Debug\
+E:\Work\C#\PointDocuments\PointDocuments\obj\Debug\
 PointDocuments
 none
 false
 DEBUG;TRACE
-D:\work\PointDocuments\PointDocuments\App.xaml
+E:\Work\C#\PointDocuments\PointDocuments\App.xaml
 7-786998003
 
-13838657329
+14-3702038
 13-1505183044
 DocumentCreateWindow.xaml;DocumentEditWindow.xaml;DocumentInfo.xaml;DocumentsPage.xaml;MainWindow.xaml;PointView.xaml;Themes\Generic.xaml;
 
-False
+True
 
