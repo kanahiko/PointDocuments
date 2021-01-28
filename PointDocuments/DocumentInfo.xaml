@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="PointDocuments.DocumentInfo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PointDocuments"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="200">
+    <Grid>
+        <StackPanel Margin="10,10,10,10" Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+            <TextBlock x:Name="DocName" Text="Проведение приемочных испытаний по сопряжению Системы-112 и МНИС1" Margin="10,10,10,0" VerticalAlignment="Top" Height="Auto" TextWrapping="WrapWithOverflow"/>
+            <Label x:Name="DocDate" Content="22.22.2021 22:09" Margin="10,10,10,0" VerticalAlignment="Top"/>
+            <Label x:Name="DocUsername" Content="USERNAME" Margin="10,10,10,0" VerticalAlignment="Top"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
