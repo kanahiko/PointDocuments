@@ -64,6 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DatabaseHandler.cs" />
     <Compile Include="Document.cs">
       <DependentUpon>PointDocumentModel.tt</DependentUpon>
     </Compile>

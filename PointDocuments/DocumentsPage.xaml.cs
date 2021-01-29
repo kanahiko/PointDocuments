@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PointDocuments
 {
@@ -32,19 +24,20 @@ namespace PointDocuments
 
             sources = new Dictionary<DataGrid, List<DocTable>>();
             changesToConnections = new HashSet<int>();
-            var categories = TestData.docTypes.Select(a => a.id).ToList();
+            DatabaseHandler.Initialize();
+            var categories = DatabaseHandler.GetSortedCategories();//TestData.docTypes.Select(a => a.id).ToList();
             foreach (var category in categories)
             {
                 CreateCategory(category);
             }
         }
 
-        void CreateCategory(int docType)
+        void CreateCategory(DocumentType docType)
         {
             Expander expander = new Expander();
-            expander.Header = TestData.docTypes.Where(a => a.id == docType).Select(a => a.name).First();
+            expander.Header = docType.Name;
             expander.Margin = new Thickness(0, 0, 0, 10);
-            expander.Expanded += (object sender, RoutedEventArgs e) => PopulateTable(docType, expander);
+            expander.Expanded += (object sender, RoutedEventArgs e) => PopulateTable(docType.id, expander);
 
             //PopulateTable(docType, expander);
             DocumentsPanel.Children.Add(expander);
@@ -59,28 +52,9 @@ namespace PointDocuments
                 return;
             }
 
-            expander.Expanded -= (object sender, RoutedEventArgs e) => PopulateTable(docType, expander);
-
-            List<Doc> docs = TestData.docs.Where(a => a.doctypeid == docType).ToList();
-            if (docs.Count > 0)
-            {
-                //TODO only select nid, name, date and username!!!! no binaries
-                List<DocTable> docReal = new List<DocTable>();
-                for (int i = 0; i < docs.Count; i++)
-                {
-                   var entry =TestData.docHistory
-                        .Select((a) =>  new DocTable(a.docid,a.name, a.date, a.username))
-                        .Where(a => a.id == docs[i].id)
-                        .OrderByDescending(a => a.date)
-                        .First();
-
-                    if (id != -1)
-                    {
-                        entry.isConnected = TestData.pointDoc.Where(a => a.pointid == id && a.docid == entry.id).Any();
-                    }
-                    docReal.Add(entry);
-                }
-
+            expander.Expanded -= (object sender, RoutedEventArgs e) => PopulateTable(docType, expander);            
+            List<DocTable> docReal = DatabaseHandler.GetDocTableDocuments(id, docType);
+            if (docReal.Count > 0) {
                 DataGrid table = new DataGrid();
                 table.AutoGenerateColumns = false;
                 table.CanUserAddRows = false;
@@ -157,7 +131,7 @@ namespace PointDocuments
         private void Table_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             DataGrid table = (DataGrid)sender;
-            if (table.CurrentCell.Column.DisplayIndex != 3)
+            if (table.CurrentCell.Column != null && table.CurrentCell.Column.DisplayIndex != 3)
             {
                 DocumentEditWindow editWindow = new DocumentEditWindow(sources[table][table.SelectedIndex].id);
                 editWindow.Owner = Window.GetWindow(this);
@@ -175,71 +149,4 @@ namespace PointDocuments
     }
 }
 
-public class CustomDataGridCheckBoxColumn : DataGridCheckBoxColumn
-{
-    protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
-    {
-        CheckBox checkBox = base.GenerateEditingElement(cell, dataItem) as CheckBox;
-        return checkBox;
-    }
-}
 
-public class DocTable : INotifyPropertyChanged
-{
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public int _id;
-    public string _name;
-    public string _date;
-    public string _username;
-    public bool _isConnected;
-    public int id { get { return _id; }
-        set
-        {
-            _id = value;
-            this.NotifyPropertyChanged("Enabled");
-        }
-    }
-    public string name { get { return _name; }
-        set
-        {
-            _name = value;
-            this.NotifyPropertyChanged("name");
-        }
-    }
-    public string date { get { return _date; }
-        set
-        {
-            _date = value;
-            this.NotifyPropertyChanged("date");
-        }
-    }
-    public string username { get { return _username; }
-        set
-        {
-            _username = value;
-            this.NotifyPropertyChanged("username");
-        }
-    }
-    public bool isConnected { get { return _isConnected; }
-        set
-        {
-            _isConnected = value;
-            this.NotifyPropertyChanged("isCOnnected");
-        }
-    }
-
-    public DocTable(int i,string a,string b,string c)
-    {
-        id = i;
-        name = a;
-        date = b;
-        username = c;
-    }
-
-    private void NotifyPropertyChanged(string name)
-    {
-        if (PropertyChanged != null)
-            PropertyChanged(this, new PropertyChangedEventArgs(name));
-    }
-}

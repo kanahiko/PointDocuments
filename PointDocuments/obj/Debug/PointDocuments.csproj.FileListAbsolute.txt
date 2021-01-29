@@ -25,3 +25,9 @@ D:\work\PointDocuments\PointDocuments\obj\Debug\DocumentCreateWindow.g.cs
 D:\work\PointDocuments\PointDocuments\obj\Debug\DocumentCreateWindow.baml
 D:\work\PointDocuments\PointDocuments\obj\Debug\DocumentsPage.g.cs
 D:\work\PointDocuments\PointDocuments\obj\Debug\DocumentsPage.baml
+D:\work\PointDocuments\PointDocuments\obj\Debug\PointDocuments_Content.g.cs
+D:\work\PointDocuments\PointDocuments\bin\Debug\EntityFramework.dll
+D:\work\PointDocuments\PointDocuments\bin\Debug\EntityFramework.SqlServer.dll
+D:\work\PointDocuments\PointDocuments\bin\Debug\EntityFramework.xml
+D:\work\PointDocuments\PointDocuments\bin\Debug\EntityFramework.SqlServer.xml
+D:\work\PointDocuments\PointDocuments\obj\Debug\PointDocuments.csproj.CopyComplete

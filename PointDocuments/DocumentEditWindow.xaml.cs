@@ -22,10 +22,10 @@ namespace PointDocuments
     /// </summary>
     public partial class DocumentEditWindow : Window
     {
-        List<string> doctypes;
-        List<int> docId;
+        List<DocumentType> doctypes;
 
         int id;
+        List<DocTable> history;
         public DocumentEditWindow(int id)
         {
             InitializeComponent();
@@ -35,8 +35,8 @@ namespace PointDocuments
 
         void PopulateHistoryTable()
         {
-            doctypes = TestData.docTypes.Select(a => a.name).ToList();
-            docId = TestData.docTypes.Select(a => a.id).ToList();
+            //TODO
+            doctypes = DatabaseHandler.GetDocumentTypes();
 
             DocTypeCombo.ItemsSource = doctypes;
 
@@ -48,11 +48,12 @@ namespace PointDocuments
             }
             else
             {
-                DocTypeCombo.SelectedIndex = docId.FindIndex(a => a == TestData.docs.Where(b => b.id == id).Select(b => b.doctypeid).First());
-                List<DocumentHistory> history = TestData.docHistory.Where(a => a.docid == id).OrderByDescending(a => a.date).ToList();
-                PointsCountLabel.Content = $"Связано с {TestData.pointDoc.Where(a => a.docid == id).Count()} точками";
+                Tuple<int, string> doc = DatabaseHandler.GetDocument(id);
+                DocTypeCombo.SelectedValue = doc.Item1;
+                history = DatabaseHandler.GetDocumentHistory(id);
+                PointsCountLabel.Content = $"Связано с {DatabaseHandler.GetPointDocumentCount(id)} точками";
                 DocumentHistory.ItemsSource = history;
-                DocumentNameLabel.Content = history[0].name;
+                DocumentNameLabel.Content = doc.Item2;
             }
 
         }
@@ -60,9 +61,8 @@ namespace PointDocuments
         {
             string filePath = string.Empty;
 
-            OpenFileDialog openFileDialog = new OpenFileDialog();T 6
+            OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = "c:\\";
-            //openFileDialog.FilterIndex = 2;
             openFileDialog.RestoreDirectory = true;
 
             if (openFileDialog.ShowDialog() == true)

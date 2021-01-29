@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PointDocuments
 {
-    public class Point
+   /* public class Point
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -18,9 +18,9 @@ namespace PointDocuments
             name = b;
             catId = c;
         }
-    }
+    }*/
 
-    public class Category
+/*    public class Category
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -50,9 +50,9 @@ namespace PointDocuments
             id = a;
             doctypeid = b;
         }
-    }
+    }*/
 
-    public class PointDocConnection
+/*    public class PointDocConnection
     {
         public int id { get; set; }
         public int docid { get; set; }
@@ -63,9 +63,9 @@ namespace PointDocuments
             docid = b;
             pointid = c;
         }
-    }
+    }*/
 
-    public class DocumentHistory
+  /*  public class DocumentHistory
     {
         public int id { get; set; }
         public int docid { get; set; }
@@ -81,9 +81,9 @@ namespace PointDocuments
             username = d;
             name = e;
         }
-    }
+    }*/
 
-    public static class TestData
+/*    public static class TestData
     {
         public static Point[] points = new Point[]
         {
@@ -120,5 +120,5 @@ namespace PointDocuments
             new DocumentHistory(4,10,"2021.01.22","A.Vasilenko","Приложение 1 - форма опросного листа"),
             new DocumentHistory(5,11,"2021.01.22","A.Moskaleva","Перечень станций (отделений, постов)  СМП ноябрь 2019г.")
         };
-    }
+    }*/
 }

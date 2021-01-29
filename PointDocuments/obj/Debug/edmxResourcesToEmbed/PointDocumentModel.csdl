@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="PointDocumentationModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="DocumentHistory">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="DocumentID" Type="Int32" Nullable="false" />
+    <Property Name="DocumentBinary" Type="Binary" MaxLength="Max" FixedLength="false" />
+    <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="UserName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="Document" Relationship="Self.FK_DocumentHistory_Documents" FromRole="DocumentHistory" ToRole="Documents" />
+    <NavigationProperty Name="Document1" Relationship="PointDocumentationModel.FK_DocumentHistory_Documents1" FromRole="DocumentHistory" ToRole="Document" />
+  </EntityType>
+  <EntityType Name="Document">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="DocType" Type="Int32" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="DocumentHistory" Relationship="Self.FK_DocumentHistory_Documents" FromRole="Documents" ToRole="DocumentHistory" />
+    <NavigationProperty Name="DocumentType" Relationship="Self.FK_Documents_Documents" FromRole="Documents" ToRole="DocumentType" />
+    <NavigationProperty Name="PointDocConnections" Relationship="Self.FK_PointDocConnections_Documents" FromRole="Documents" ToRole="PointDocConnections" />
+    <NavigationProperty Name="DocumentHistories" Relationship="PointDocumentationModel.FK_DocumentHistory_Documents1" FromRole="Document" ToRole="DocumentHistory" />
+  </EntityType>
+  <EntityType Name="DocumentType">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="Documents" Relationship="Self.FK_Documents_Documents" FromRole="DocumentType" ToRole="Documents" />
+  </EntityType>
+  <EntityType Name="PointDocConnection">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="PointID" Type="Int32" Nullable="false" />
+    <Property Name="DocumentID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Document" Relationship="Self.FK_PointDocConnections_Documents" FromRole="PointDocConnections" ToRole="Documents" />
+    <NavigationProperty Name="Point" Relationship="Self.FK_PointDocConnections_Points" FromRole="PointDocConnections" ToRole="Points" />
+  </EntityType>
+  <EntityType Name="Point">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="CategoryID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="PointDocConnections" Relationship="Self.FK_PointDocConnections_Points" FromRole="Points" ToRole="PointDocConnections" />
+    <NavigationProperty Name="PointType" Relationship="Self.FK_Points_PointTypes" FromRole="Points" ToRole="PointTypes" />
+    <NavigationProperty Name="PointType1" Relationship="PointDocumentationModel.FK_Points_PointTypes1" FromRole="Point" ToRole="PointType" />
+  </EntityType>
+  <EntityType Name="PointType">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Point" Relationship="Self.FK_Points_PointTypes" FromRole="PointTypes" ToRole="Points" />
+    <NavigationProperty Name="Points" Relationship="PointDocumentationModel.FK_Points_PointTypes1" FromRole="PointType" ToRole="Point" />
+  </EntityType>
+  <EntityType Name="sysdiagram">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <Association Name="FK_DocumentHistory_Documents">
+    <End Role="Documents" Type="Self.Document" Multiplicity="1" />
+    <End Role="DocumentHistory" Type="Self.DocumentHistory" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Documents">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="DocumentHistory">
+        <PropertyRef Name="id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Documents_Documents">
+    <End Role="DocumentType" Type="Self.DocumentType" Multiplicity="1" />
+    <End Role="Documents" Type="Self.Document" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="DocumentType">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="Documents">
+        <PropertyRef Name="DocType" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PointDocConnections_Documents">
+    <End Role="Documents" Type="Self.Document" Multiplicity="1" />
+    <End Role="PointDocConnections" Type="Self.PointDocConnection" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Documents">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="PointDocConnections">
+        <PropertyRef Name="DocumentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PointDocConnections_Points">
+    <End Role="Points" Type="Self.Point" Multiplicity="1" />
+    <End Role="PointDocConnections" Type="Self.PointDocConnection" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Points">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="PointDocConnections">
+        <PropertyRef Name="PointID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Points_PointTypes">
+    <End Role="PointTypes" Type="Self.PointType" Multiplicity="1" />
+    <End Role="Points" Type="Self.Point" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="PointTypes">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="Points">
+        <PropertyRef Name="id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="PointDocumentationEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="DocumentHistories" EntityType="Self.DocumentHistory" />
+    <EntitySet Name="Documents" EntityType="Self.Document" />
+    <EntitySet Name="DocumentTypes" EntityType="Self.DocumentType" />
+    <EntitySet Name="PointDocConnections" EntityType="Self.PointDocConnection" />
+    <EntitySet Name="Points" EntityType="Self.Point" />
+    <EntitySet Name="PointTypes" EntityType="Self.PointType" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+    <AssociationSet Name="FK_DocumentHistory_Documents" Association="Self.FK_DocumentHistory_Documents">
+      <End Role="Documents" EntitySet="Documents" />
+      <End Role="DocumentHistory" EntitySet="DocumentHistories" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Documents_Documents" Association="Self.FK_Documents_Documents">
+      <End Role="DocumentType" EntitySet="DocumentTypes" />
+      <End Role="Documents" EntitySet="Documents" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PointDocConnections_Documents" Association="Self.FK_PointDocConnections_Documents">
+      <End Role="Documents" EntitySet="Documents" />
+      <End Role="PointDocConnections" EntitySet="PointDocConnections" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PointDocConnections_Points" Association="Self.FK_PointDocConnections_Points">
+      <End Role="Points" EntitySet="Points" />
+      <End Role="PointDocConnections" EntitySet="PointDocConnections" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Points_PointTypes" Association="Self.FK_Points_PointTypes">
+      <End Role="PointTypes" EntitySet="PointTypes" />
+      <End Role="Points" EntitySet="Points" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Points_PointTypes1" Association="PointDocumentationModel.FK_Points_PointTypes1">
+      <End Role="PointType" EntitySet="PointTypes" />
+      <End Role="Point" EntitySet="Points" />
+    </AssociationSet>
+    <AssociationSet Name="FK_DocumentHistory_Documents1" Association="PointDocumentationModel.FK_DocumentHistory_Documents1">
+      <End Role="Document" EntitySet="Documents" />
+      <End Role="DocumentHistory" EntitySet="DocumentHistories" />
+    </AssociationSet>
+  </EntityContainer>
+  <Association Name="FK_Points_PointTypes1">
+    <End Type="PointDocumentationModel.PointType" Role="PointType" Multiplicity="1" />
+    <End Type="PointDocumentationModel.Point" Role="Point" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="PointType">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="Point">
+        <PropertyRef Name="CategoryID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_DocumentHistory_Documents1">
+    <End Type="PointDocumentationModel.Document" Role="Document" Multiplicity="1" />
+    <End Type="PointDocumentationModel.DocumentHistory" Role="DocumentHistory" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Document">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="DocumentHistory">
+        <PropertyRef Name="DocumentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

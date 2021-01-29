@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="PointDocumentationModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="PointDocumentationModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="DocumentHistory">
           <Key>
             <PropertyRef Name="id" />
@@ -65,13 +65,13 @@
         </EntityType>
         <Association Name="FK_DocumentHistory_Documents">
           <End Role="Documents" Type="Self.Documents" Multiplicity="1" />
-          <End Role="DocumentHistory" Type="Self.DocumentHistory" Multiplicity="0..1" />
+          <End Role="DocumentHistory" Type="Self.DocumentHistory" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Documents">
               <PropertyRef Name="id" />
             </Principal>
             <Dependent Role="DocumentHistory">
-              <PropertyRef Name="id" />
+              <PropertyRef Name="DocumentID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -113,13 +113,13 @@
         </Association>
         <Association Name="FK_Points_PointTypes">
           <End Role="PointTypes" Type="Self.PointTypes" Multiplicity="1" />
-          <End Role="Points" Type="Self.Points" Multiplicity="0..1" />
+          <End Role="Points" Type="Self.Points" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="PointTypes">
               <PropertyRef Name="id" />
             </Principal>
             <Dependent Role="Points">
-              <PropertyRef Name="id" />
+              <PropertyRef Name="CategoryID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -152,8 +152,7 @@
             <End Role="Points" EntitySet="Points" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="PointDocumentationModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -167,6 +166,7 @@
           <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UserName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Document" Relationship="Self.FK_DocumentHistory_Documents" FromRole="DocumentHistory" ToRole="Documents" />
+          <NavigationProperty Name="Document1" Relationship="PointDocumentationModel.FK_DocumentHistory_Documents1" FromRole="DocumentHistory" ToRole="Document" />
         </EntityType>
         <EntityType Name="Document">
           <Key>
@@ -178,6 +178,7 @@
           <NavigationProperty Name="DocumentHistory" Relationship="Self.FK_DocumentHistory_Documents" FromRole="Documents" ToRole="DocumentHistory" />
           <NavigationProperty Name="DocumentType" Relationship="Self.FK_Documents_Documents" FromRole="Documents" ToRole="DocumentType" />
           <NavigationProperty Name="PointDocConnections" Relationship="Self.FK_PointDocConnections_Documents" FromRole="Documents" ToRole="PointDocConnections" />
+          <NavigationProperty Name="DocumentHistories" Relationship="PointDocumentationModel.FK_DocumentHistory_Documents1" FromRole="Document" ToRole="DocumentHistory" />
         </EntityType>
         <EntityType Name="DocumentType">
           <Key>
@@ -206,6 +207,7 @@
           <Property Name="CategoryID" Type="Int32" Nullable="false" />
           <NavigationProperty Name="PointDocConnections" Relationship="Self.FK_PointDocConnections_Points" FromRole="Points" ToRole="PointDocConnections" />
           <NavigationProperty Name="PointType" Relationship="Self.FK_Points_PointTypes" FromRole="Points" ToRole="PointTypes" />
+          <NavigationProperty Name="PointType1" Relationship="PointDocumentationModel.FK_Points_PointTypes1" FromRole="Point" ToRole="PointType" />
         </EntityType>
         <EntityType Name="PointType">
           <Key>
@@ -214,6 +216,7 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Point" Relationship="Self.FK_Points_PointTypes" FromRole="PointTypes" ToRole="Points" />
+          <NavigationProperty Name="Points" Relationship="PointDocumentationModel.FK_Points_PointTypes1" FromRole="PointType" ToRole="Point" />
         </EntityType>
         <EntityType Name="sysdiagram">
           <Key>
@@ -313,7 +316,39 @@
             <End Role="PointTypes" EntitySet="PointTypes" />
             <End Role="Points" EntitySet="Points" />
           </AssociationSet>
+          <AssociationSet Name="FK_Points_PointTypes1" Association="PointDocumentationModel.FK_Points_PointTypes1">
+            <End Role="PointType" EntitySet="PointTypes" />
+            <End Role="Point" EntitySet="Points" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DocumentHistory_Documents1" Association="PointDocumentationModel.FK_DocumentHistory_Documents1">
+            <End Role="Document" EntitySet="Documents" />
+            <End Role="DocumentHistory" EntitySet="DocumentHistories" />
+          </AssociationSet>
         </EntityContainer>
+        <Association Name="FK_Points_PointTypes1">
+          <End Type="PointDocumentationModel.PointType" Role="PointType" Multiplicity="1" />
+          <End Type="PointDocumentationModel.Point" Role="Point" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PointType">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Point">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DocumentHistory_Documents1">
+          <End Type="PointDocumentationModel.Document" Role="Document" Multiplicity="1" />
+          <End Type="PointDocumentationModel.DocumentHistory" Role="DocumentHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="DocumentHistory">
+              <PropertyRef Name="DocumentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->

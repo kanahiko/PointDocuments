@@ -31,25 +31,24 @@ namespace PointDocuments
 
             this.id = id;
 
-            Point point = TestData.points.Where(a => a.id == id).First();
-            PointName.Content = point.name;
-            CategoryName.Content = TestData.categories.Where(a => a.id == point.catId).Select(a=>a.name).First();
+            Point point = DatabaseHandler.GetPoint(id);
+            PointName.Content = point.Name;
+            CategoryName.Content = DatabaseHandler.GetPointCategory(point.id);
 
-            docPoint = TestData.pointDoc.Where(a => a.pointid == id).Select(a=>a.docid).ToHashSet();
-            HashSet<int> categories = TestData.docs.Where(a => docPoint.Contains(a.id)).Select(a => a.doctypeid).ToHashSet();
-            List<DocType> sortedCategories = TestData.docTypes.Where(a => categories.Contains(a.id)).OrderBy(a=>a.name).ToList();
+            docPoint = DatabaseHandler.GetDocumentsID(id);
+            List<DocumentType> sortedCategories = DatabaseHandler.GetSortedCategories(id, docPoint);
             categoriesDictionary = new Dictionary<int, Expander>();
 
             foreach (var category in sortedCategories)
             {
-                CreateCategory(category.id);
+                CreateCategory(category.id, category.Name);
             }
         }
 
-        void CreateCategory(int docType)
+        void CreateCategory(int docType, string name)
         {
             Expander expander = new Expander();
-            expander.Header = TestData.docTypes.Where(a => a.id == docType).Select(a => a.name).First();
+            expander.Header = name;
             expander.Margin = new Thickness(0, 0, 0, 10);
             expander.Expanded += (object sender, RoutedEventArgs e) =>PopulateTable(docType,expander);
             categoriesDictionary.Add(docType, expander);
@@ -68,19 +67,8 @@ namespace PointDocuments
 
             expander.Expanded -= (object sender, RoutedEventArgs e) => PopulateTable(docType,expander);
 
-            List<Doc> docs = TestData.docs.Where(a => docPoint.Contains(a.id) && a.doctypeid == docType).ToList();
             //TODO only select nid, name, date and username!!!! no binaries
-            List<DocTable> docReal = new List<DocTable>();
-            for (int i = 0; i < docs.Count; i++)
-            {
-                var entry = TestData.docHistory
-                           .Select((a) => new DocTable(a.docid, a.name, a.date, a.username))
-                           .Where(a => a.id == docs[i].id)
-                           .OrderByDescending(a => a.date)
-                           .First();
-                docReal.Add(entry);
-                //docReal.Add(TestData.docHistory.Where(a => a.docid == docs[i].id).OrderByDescending(a => a.date).First());
-            }
+            List<DocTable> docReal = DatabaseHandler.GetDocTableDocuments(docPoint, docType);
 
             DataGrid table = new DataGrid();
             table.SelectionMode = DataGridSelectionMode.Single;

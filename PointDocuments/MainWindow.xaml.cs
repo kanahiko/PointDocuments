@@ -20,7 +20,7 @@ namespace PointDocuments
 
         Dictionary<int,TabItem> clickedPoints = new Dictionary<int, TabItem>();
 
-        List<string> points = new List<string>();
+        //List<string> points = new List<string>();
 
         public MainWindow()
         {
@@ -29,40 +29,50 @@ namespace PointDocuments
             DocumentsPage page = new DocumentsPage(-1);
             DocumentsFrame.Content = page;
 
-            for (int i=0;i< TestData.points.Length; i++)
+            /*for (int i=0;i < TestData.points.Length; i++)
             {
                 points.Add(TestData.points[i].name);
-            }
-            PointsList.ItemsSource = points;
+            }*/
+            DatabaseHandler.Initialize();
+            PointsList.ItemsSource = DatabaseHandler.GetPointsList();
+
+            //Test();
             //AddNewPointGrid.Visibility = Visibility.Collapsed;
 
         }
 
+        void Test() {
+            var t = DatabaseHandler.GetDocumentsID(14);
+            var c = DatabaseHandler.GetDocTableDocuments(t, 2);
+        }
+
         private void OnPointSelected(object sender, MouseButtonEventArgs e)
         {
-            if (clickedPoints.ContainsKey(PointsList.SelectedIndex) || Tabs.Items.Count >= Util.maxTabs)
+            int pointId = DatabaseHandler.GetPointId(PointsList.SelectedIndex);
+            if (clickedPoints.ContainsKey(pointId) || Tabs.Items.Count >= Util.maxTabs)
             {
                 return;
             }
+            string pointName = PointsList.Items[PointsList.SelectedIndex] as string;
+
             TabItem newTabItem = new TabItem
             {
-                Name = TestData.points[PointsList.SelectedIndex].name+TestData.points[PointsList.SelectedIndex].id.ToString()
+                Name = pointName + pointId.ToString()
             };
            
-            newTabItem.Header = CreateTabHeader(TestData.points[PointsList.SelectedIndex].name, PointsList.SelectedIndex);
-            clickedPoints.Add(PointsList.SelectedIndex, newTabItem);
+            newTabItem.Header = CreateTabHeader(pointName, pointId);
+            clickedPoints.Add(pointId, newTabItem);
 
             Frame frame = new Frame();
             newTabItem.Content = frame;
-            PointView newtab = new PointView(TestData.points[PointsList.SelectedIndex].id);
+            PointView newtab = new PointView(pointId);
             frame.Content = newtab;
             
             Tabs.Items.Add(newTabItem);
-
             Tabs.SelectedIndex = Tabs.Items.Count - 1;
         }
 
-        StackPanel CreateTabHeader(string name, int index)
+        StackPanel CreateTabHeader(string name, int id)
         {
             StackPanel panel = new StackPanel();
             panel.Height = Util.panelHeight;
@@ -79,7 +89,7 @@ namespace PointDocuments
             closeButton.Width = Util.buttonSize;
             closeButton.Background = Brushes.Transparent;
             closeButton.FontSize = Util.fontSize;
-            closeButton.Click += (object sender, RoutedEventArgs e) => { OnTabClosing(index); };
+            closeButton.Click += (object sender, RoutedEventArgs e) => { OnTabClosing(id); };
 
 
             panel.Children.Add(label);

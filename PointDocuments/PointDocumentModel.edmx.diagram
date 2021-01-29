@@ -17,6 +17,8 @@
         <AssociationConnector Association="PointDocumentationModel.FK_PointDocConnections_Documents" ManuallyRouted="false" />
         <AssociationConnector Association="PointDocumentationModel.FK_PointDocConnections_Points" ManuallyRouted="false" />
         <AssociationConnector Association="PointDocumentationModel.FK_Points_PointTypes" ManuallyRouted="false" />
+        <AssociationConnector Association="PointDocumentationModel.FK_Points_PointTypes1" />
+        <AssociationConnector Association="PointDocumentationModel.FK_DocumentHistory_Documents1" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

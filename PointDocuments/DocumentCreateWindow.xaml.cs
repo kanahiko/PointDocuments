@@ -23,28 +23,24 @@ namespace PointDocuments
     public partial class DocumentCreateWindow : Window
     {
         string filePath = string.Empty;
-        List<string> doctypes;
-        List<int> docId;
+        List<DocumentType> doctypes { get; set; }
         public DocumentCreateWindow()
         {
             InitializeComponent();
 
-            doctypes = TestData.docTypes.Select(a => a.name).ToList();
-            docId = TestData.docTypes.Select(a => a.id).ToList();
 
+            doctypes = DatabaseHandler.GetDocumentTypes();
             DocTypeCombo.ItemsSource = doctypes;
             DocTypeCombo.SelectedIndex = 0;
+
 
             SaveDocument.IsEnabled = false;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //filePath = string.Empty;
-            System.Diagnostics.Debug.WriteLine(FileNameLabel.ActualWidth);
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = "c:\\";
-            //openFileDialog.FilterIndex = 2;
             openFileDialog.RestoreDirectory = true;
 
             if (openFileDialog.ShowDialog() == true)
@@ -52,10 +48,6 @@ namespace PointDocuments
                 //Get the path of specified file
                 filePath = openFileDialog.FileName;
                 string path = filePath.Substring(filePath.LastIndexOf("\\") + 1);
-                /*if (path.Length > 10)
-                {
-                    path = path.Substring(0, 10) + "...";
-                }*/
                 FileNameLabel.Text = path;
                 FileNameLabel.Foreground = Brushes.Black;
 
