@@ -11,7 +11,7 @@
         <EntityTypeShape EntityType="PointDocumentationModel.PointDocConnection" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="PointDocumentationModel.Point" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
         <EntityTypeShape EntityType="PointDocumentationModel.PointType" Width="1.5" PointX="0.75" PointY="7.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="PointDocumentationModel.sysdiagram" Width="1.5" PointX="8.125" PointY="7.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="PointDocumentationModel.sysdiagram" Width="1.5" PointX="10.5" PointY="6.375" IsExpanded="true" />
         <AssociationConnector Association="PointDocumentationModel.FK_DocumentHistory_Documents" ManuallyRouted="false" />
         <AssociationConnector Association="PointDocumentationModel.FK_Documents_Documents" ManuallyRouted="false" />
         <AssociationConnector Association="PointDocumentationModel.FK_PointDocConnections_Documents" ManuallyRouted="false" />

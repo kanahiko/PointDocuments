@@ -21,6 +21,5 @@ namespace PointDocuments
         public string UserName { get; set; }
     
         public virtual Document Document { get; set; }
-        public virtual Document Document1 { get; set; }
     }
 }

@@ -5,11 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PointDocuments"
         mc:Ignorable="d"
-        Title="Редактировать документ" Height="450" Width="800" WindowStartupLocation="CenterOwner" Topmost="True">
+        Title="Редактировать документ" Height="450" Width="800" WindowStartupLocation="CenterOwner" Topmost="True" Closing="Window_Closing">
     <Grid>
         <StackPanel  Margin="10,10,10,10" ScrollViewer.VerticalScrollBarVisibility="Auto" CanVerticallyScroll="True">
-            <Label x:Name="DocumentNameLabel" Content="NAME" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-            <ComboBox x:Name="DocTypeCombo" Width="150" HorizontalAlignment="Left" Margin="0,0,0,10" Padding="5,2,5,2" SelectionChanged="DocTypeCombo_SelectionChanged"
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Label  Content="Имя документа" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBox x:Name="DocumentName" Width="350" Text="" Padding="5,2"/>
+            </StackPanel>
+            <ComboBox x:Name="DocTypeCombo" Width="150" HorizontalAlignment="Left" Margin="0,0,0,10" Padding="5,2,5,2"
                       ItemsSource="{Binding docTypes}"
                       DisplayMemberPath="Name"
                       SelectedValuePath="id"/>
@@ -17,7 +20,7 @@
             <Label x:Name="PointsCountLabel" Content="Связано с 0 точками" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
             <Button x:Name="ChangeDocument" Content="➕ Добавить новую версию документа" Padding="5,2,5,2" HorizontalAlignment="Left" Margin="0,0,0,10" Width="Auto" Click="ChangeDocument_Click"/>
             <Label Content="История изменений:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-            <DataGrid x:Name="DocumentHistory" ItemsSource="{Binding}" AutoGenerateColumns="False" SelectionMode="Single" SelectionUnit="FullRow" IsReadOnly="true"> 
+            <DataGrid x:Name="DocumentHistory" ItemsSource="{Binding}" AutoGenerateColumns="False" SelectionMode="Single" SelectionUnit="FullRow" IsReadOnly="true" Margin="0,0,0,10"> 
                 <DataGrid.Columns>
                     <!--<DataGridTextColumn Header="Название файла" Binding="{Binding Name}"/>-->
                     <DataGridTextColumn Header="Дата изменения" Binding="{Binding date}"/>
@@ -25,6 +28,7 @@
                 </DataGrid.Columns>
             </DataGrid>
 
+            <Button x:Name="CancelChange" Content="Отменить текущие изменения" Padding="5,2,5,2" HorizontalAlignment="Left" Margin="0,0,0,10" Width="Auto" Click="CancelChange_Click"/>
         </StackPanel>
     </Grid>
 </Window>

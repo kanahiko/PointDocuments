@@ -27,6 +27,5 @@ namespace PointDocuments
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PointDocConnection> PointDocConnections { get; set; }
         public virtual PointType PointType { get; set; }
-        public virtual PointType PointType1 { get; set; }
     }
 }

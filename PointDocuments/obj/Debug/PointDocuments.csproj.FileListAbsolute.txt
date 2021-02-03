@@ -31,3 +31,5 @@ D:\work\PointDocuments\PointDocuments\bin\Debug\EntityFramework.SqlServer.dll
 D:\work\PointDocuments\PointDocuments\bin\Debug\EntityFramework.xml
 D:\work\PointDocuments\PointDocuments\bin\Debug\EntityFramework.SqlServer.xml
 D:\work\PointDocuments\PointDocuments\obj\Debug\PointDocuments.csproj.CopyComplete
+D:\work\PointDocuments\PointDocuments\obj\Debug\Test.g.cs
+D:\work\PointDocuments\PointDocuments\obj\Debug\Test.baml

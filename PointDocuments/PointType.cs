@@ -23,7 +23,6 @@ namespace PointDocuments
         public int id { get; set; }
         public string Name { get; set; }
     
-        public virtual Point Point { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Point> Points { get; set; }
     }

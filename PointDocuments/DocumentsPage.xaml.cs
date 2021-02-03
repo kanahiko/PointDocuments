@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,7 @@ namespace PointDocuments
         int id;
 
         Dictionary<DataGrid, List<DocTable>> sources;
+        Dictionary<int, DataGrid> typeToTable;
 
         HashSet<int> changesToConnections;
         public DocumentsPage(int id)
@@ -23,15 +25,20 @@ namespace PointDocuments
             this.id = id;
 
             sources = new Dictionary<DataGrid, List<DocTable>>();
+            typeToTable = new Dictionary<int, DataGrid>();
             changesToConnections = new HashSet<int>();
             DatabaseHandler.Initialize();
-            var categories = DatabaseHandler.GetSortedCategories();//TestData.docTypes.Select(a => a.id).ToList();
+            var categories = DatabaseHandler.GetSortedCategories();
             foreach (var category in categories)
             {
                 CreateCategory(category);
             }
         }
 
+        /// <summary>
+        /// Creating empty expanders for all categories
+        /// </summary>
+        /// <param name="docType"></param>
         void CreateCategory(DocumentType docType)
         {
             Expander expander = new Expander();
@@ -39,10 +46,7 @@ namespace PointDocuments
             expander.Margin = new Thickness(0, 0, 0, 10);
             expander.Expanded += (object sender, RoutedEventArgs e) => PopulateTable(docType.id, expander);
 
-            //PopulateTable(docType, expander);
             DocumentsPanel.Children.Add(expander);
-
-            //TestDataGrid.ItemsSource = docReal;
         }
 
         void PopulateTable(int docType, Expander expander)
@@ -54,59 +58,28 @@ namespace PointDocuments
 
             expander.Expanded -= (object sender, RoutedEventArgs e) => PopulateTable(docType, expander);            
             List<DocTable> docReal = DatabaseHandler.GetDocTableDocuments(id, docType);
-            if (docReal.Count > 0) {
-                DataGrid table = new DataGrid();
-                table.AutoGenerateColumns = false;
-                table.CanUserAddRows = false;
-                table.CanUserDeleteRows = false;
-                table.CanUserSortColumns = true;                
-                table.SelectionMode = DataGridSelectionMode.Single;
-                table.SelectionUnit = DataGridSelectionUnit.FullRow;
-                table.MaxHeight = 500;
-                table.IsReadOnly = true;
-                if (id != -1)
-                {
-                    table.PreviewMouseUp += Table_MouseDown;
-                    table.MouseDown += Table_MouseDown;
-                }
-                table.MouseDoubleClick += Table_MouseDoubleClick;
 
-                DataGridTextColumn textColumn = new DataGridTextColumn();
-                textColumn.Header = "Название файла";
-                textColumn.Binding = new Binding("name");
-                table.Columns.Add(textColumn);
-
-
-                textColumn = new DataGridTextColumn();
-                textColumn.Header = "Дата изменения";
-                textColumn.Binding = new Binding("date");
-                table.Columns.Add(textColumn);
-
-
-                textColumn = new DataGridTextColumn();
-                textColumn.Header = "Пользователь";
-                textColumn.Binding = new Binding("username");
-                table.Columns.Add(textColumn);
-
-                if (id != -1)
-                {
-                    CustomDataGridCheckBoxColumn checkBoxColumn = new CustomDataGridCheckBoxColumn();
-                    checkBoxColumn.Header = "Отностится к точке";
-
-                    Binding binding = new Binding("isConnected");
-                    checkBoxColumn.Binding = binding;
-                    binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-                    binding.Mode = BindingMode.TwoWay;
-                    checkBoxColumn.IsReadOnly = true;
-                    table.Columns.Add(checkBoxColumn);
-                }
-
-                sources.Add(table, docReal);
-
-                table.ItemsSource = docReal;
-                expander.Content = table;
+            DataGrid table = Util.CreateDatagrid(id);
+            if (id != -1)
+            {
+                table.PreviewMouseUp += Table_MouseDown;
+                table.MouseDown += Table_MouseDown;
             }
+            table.MouseDoubleClick += Table_MouseDoubleClick;
 
+            sources.Add(table, docReal);
+
+            table.ItemsSource = docReal;
+            expander.Content = table;
+            typeToTable.Add(docType, table);
+        }
+
+        void UpdateTable(int docType)
+        {
+            if (typeToTable.ContainsKey(docType))
+            {
+                sources[typeToTable[docType]].Add(DatabaseHandler.GetLatestDocument(docType, id));
+            }
         }
 
 
@@ -144,8 +117,18 @@ namespace PointDocuments
         {
             DocumentCreateWindow createWindow = new DocumentCreateWindow(); 
             createWindow.Owner = Window.GetWindow(this);
+            createWindow.Closing += CreateWindow_Closing; 
             createWindow.ShowDialog();
         }
+
+        private void CreateWindow_Closing(object sender, CancelEventArgs e)
+        {
+            int type = (int)((DocumentCreateWindow)sender).DocTypeCombo.SelectedValue;
+            UpdateTable(type);
+            e.Cancel = false;
+        }
+
+        
     }
 }
 

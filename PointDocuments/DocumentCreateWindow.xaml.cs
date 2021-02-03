@@ -24,12 +24,12 @@ namespace PointDocuments
     {
         string filePath = string.Empty;
         List<DocumentType> doctypes { get; set; }
+
         public DocumentCreateWindow()
         {
             InitializeComponent();
 
-
-            doctypes = DatabaseHandler.GetDocumentTypes();
+        doctypes = DatabaseHandler.GetDocumentTypes();
             DocTypeCombo.ItemsSource = doctypes;
             DocTypeCombo.SelectedIndex = 0;
 
@@ -63,7 +63,7 @@ namespace PointDocuments
             }
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void SaveDocument_Click(object sender, RoutedEventArgs e)
         {
             if (filePath == string.Empty)
             {
@@ -72,13 +72,28 @@ namespace PointDocuments
             else
             {
                 //ADD FILE TO DATABASE
+                string name = DocName.Text;
+                if (name == "")
+                {
+                    name = FileNameLabel.Text;
+                    name = name.Substring(0, name.LastIndexOf("."));
+                }
+                DatabaseHandler.CreateDocument(filePath, (int)DocTypeCombo.SelectedValue, name);
                 this.Close();
             }
+
         }
 
-        private void DocTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DocName_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //???
+            if (DocName.Text.Length > 0)
+            {
+                DocNamePlaceholder.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                DocNamePlaceholder.Visibility = Visibility.Visible;
+            }
         }
     }
 }

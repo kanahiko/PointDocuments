@@ -110,6 +110,9 @@
     <Compile Include="sysdiagram.cs">
       <DependentUpon>PointDocumentModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Test.xaml.cs">
+      <DependentUpon>Test.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TestData.cs" />
     <Compile Include="Util.cs" />
     <Page Include="DocumentCreateWindow.xaml">
@@ -145,6 +148,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="PointView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

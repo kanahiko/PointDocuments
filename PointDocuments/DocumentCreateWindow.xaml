@@ -16,12 +16,16 @@
                 <Button Content="Загрузить документ" Click="Button_Click" Margin="0,0,5,0" Padding="5,2,5,2"/>
                 <TextBlock  x:Name="FileNameLabel" Text="..." Padding="0" TextTrimming="CharacterEllipsis" Grid.Column="1"/>
             </Grid>
+            <Grid Background="White" >
+                <TextBlock x:Name="DocNamePlaceholder" Margin="5,2" Text="Имя документа" Padding="0" Foreground="#FF9E9E9E"/>
+                <TextBox x:Name="DocName" Margin="0,0,0,10" Background="{x:Null}" TextChanged="DocName_TextChanged" Padding="5,2"/>
+            </Grid>
             <ComboBox x:Name="DocTypeCombo" Margin="0,0,0,10" ItemsSource="{Binding doctypes}"
           DisplayMemberPath="Name"
           SelectedValuePath="id"
-                      Padding="5,2,5,2" SelectionChanged="DocTypeCombo_SelectionChanged" />
+                      Padding="5,2,5,2" />
 
-            <Button x:Name="SaveDocument" Content="Сохранить документ" Click="Button_Click_1" Padding="5,2,5,2"/>
+            <Button x:Name="SaveDocument" Content="Сохранить документ" Padding="5,2,5,2" Click="SaveDocument_Click"/>
         </StackPanel>
     </Grid>
 </Window>

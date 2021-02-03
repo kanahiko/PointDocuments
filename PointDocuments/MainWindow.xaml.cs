@@ -29,21 +29,13 @@ namespace PointDocuments
             DocumentsPage page = new DocumentsPage(-1);
             DocumentsFrame.Content = page;
 
-            /*for (int i=0;i < TestData.points.Length; i++)
-            {
-                points.Add(TestData.points[i].name);
-            }*/
             DatabaseHandler.Initialize();
             PointsList.ItemsSource = DatabaseHandler.GetPointsList();
 
-            //Test();
+            DatabaseHandler.CreatePoint("TEST", 4);
+
             //AddNewPointGrid.Visibility = Visibility.Collapsed;
 
-        }
-
-        void Test() {
-            var t = DatabaseHandler.GetDocumentsID(14);
-            var c = DatabaseHandler.GetDocTableDocuments(t, 2);
         }
 
         private void OnPointSelected(object sender, MouseButtonEventArgs e)
@@ -118,5 +110,6 @@ namespace PointDocuments
             System.Diagnostics.Debug.WriteLine("test");
 
         }
+
     }
 }

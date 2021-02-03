@@ -26,6 +26,9 @@ namespace PointDocuments
 
         int id;
         List<DocTable> history;
+        int originalDocType;
+        string originalName;
+        List<int> addedIds;
         public DocumentEditWindow(int id)
         {
             InitializeComponent();
@@ -35,28 +38,25 @@ namespace PointDocuments
 
         void PopulateHistoryTable()
         {
-            //TODO
             doctypes = DatabaseHandler.GetDocumentTypes();
-
             DocTypeCombo.ItemsSource = doctypes;
 
-            if (id == -1)
-            {
-                DocTypeCombo.SelectedIndex = 0;
+            Tuple<int, string> doc = DatabaseHandler.GetDocument(id);
+            originalDocType = doc.Item1;
+            originalName = doc.Item2;
+            DocumentName.Text = originalName;
+            DocTypeCombo.SelectedValue = originalDocType;
 
-                DocumentNameLabel.Content = "Новый";
-            }
-            else
-            {
-                Tuple<int, string> doc = DatabaseHandler.GetDocument(id);
-                DocTypeCombo.SelectedValue = doc.Item1;
-                history = DatabaseHandler.GetDocumentHistory(id);
-                PointsCountLabel.Content = $"Связано с {DatabaseHandler.GetPointDocumentCount(id)} точками";
-                DocumentHistory.ItemsSource = history;
-                DocumentNameLabel.Content = doc.Item2;
-            }
-
+            history = DatabaseHandler.GetDocumentHistory(id);
+            PointsCountLabel.Content = $"Связано с {DatabaseHandler.GetPointDocumentCount(id)} точками";
+            DocumentHistory.ItemsSource = history;
         }
+
+        void UpdateHistorytable()
+        {
+            history.Add(DatabaseHandler.GetLatestHistory(id));
+        }
+
         private void ChangeDocument_Click(object sender, RoutedEventArgs e)
         {
             string filePath = string.Empty;
@@ -70,13 +70,29 @@ namespace PointDocuments
                 //Get the path of specified file
                 filePath = openFileDialog.FileName;
             }
+
+            addedIds = new List<int>();
+            DatabaseHandler.CreateDocumentHistrory(id, filePath);
             //TODO send stuff to database and refresh table
-            PopulateHistoryTable();
+            UpdateHistorytable();
         }
 
-        private void DocTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CancelChange_Click(object sender, RoutedEventArgs e)
         {
-            //TODO send stuff to database
+            DocumentName.Text = originalName;
+            DocTypeCombo.SelectedValue = originalDocType;
+
+            if (addedIds != null)
+            {
+                //TODO delete all added ids
+                
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            DatabaseHandler.ChangeDocument(id, DocumentName.Text, (int)DocTypeCombo.SelectedValue);
+            e.Cancel = false;
         }
     }
 }
