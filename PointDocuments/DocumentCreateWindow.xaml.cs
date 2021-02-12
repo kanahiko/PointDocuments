@@ -28,11 +28,9 @@ namespace PointDocuments
         public DocumentCreateWindow()
         {
             InitializeComponent();
-
-        doctypes = DatabaseHandler.GetDocumentTypes();
+            doctypes = DatabaseHandler.GetDocumentTypes();
             DocTypeCombo.ItemsSource = doctypes;
             DocTypeCombo.SelectedIndex = 0;
-
 
             SaveDocument.IsEnabled = false;
         }
@@ -78,6 +76,7 @@ namespace PointDocuments
                     name = FileNameLabel.Text;
                     name = name.Substring(0, name.LastIndexOf("."));
                 }
+                SavedDocument.IsChecked = true;
                 DatabaseHandler.CreateDocument(filePath, (int)DocTypeCombo.SelectedValue, name);
                 this.Close();
             }

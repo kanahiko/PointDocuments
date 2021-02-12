@@ -5,18 +5,15 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="1f0625dd8cd64fef8542f6866f4106b4" Name="Diagram1">
-        <EntityTypeShape EntityType="PointDocumentationModel.DocumentHistory" Width="1.5" PointX="5.25" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PointDocumentationModel.DocumentHistory" Width="1.5" PointX="0.75" PointY="2.625" IsExpanded="true" />
         <EntityTypeShape EntityType="PointDocumentationModel.Document" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="PointDocumentationModel.DocumentType" Width="1.5" PointX="0.75" PointY="4" IsExpanded="true" />
-        <EntityTypeShape EntityType="PointDocumentationModel.PointDocConnection" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="PointDocumentationModel.Point" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="PointDocumentationModel.PointType" Width="1.5" PointX="0.75" PointY="7.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="PointDocumentationModel.sysdiagram" Width="1.5" PointX="10.5" PointY="6.375" IsExpanded="true" />
-        <AssociationConnector Association="PointDocumentationModel.FK_DocumentHistory_Documents" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="PointDocumentationModel.DocumentType" Width="1.5" PointX="0.75" PointY="5.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="PointDocumentationModel.PointDocConnection" Width="1.5" PointX="6.125" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PointDocumentationModel.Point" Width="1.5" PointX="3.25" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PointDocumentationModel.PointType" Width="1.5" PointX="0.625" PointY="8" IsExpanded="true" />
         <AssociationConnector Association="PointDocumentationModel.FK_Documents_Documents" ManuallyRouted="false" />
         <AssociationConnector Association="PointDocumentationModel.FK_PointDocConnections_Documents" ManuallyRouted="false" />
         <AssociationConnector Association="PointDocumentationModel.FK_PointDocConnections_Points" ManuallyRouted="false" />
-        <AssociationConnector Association="PointDocumentationModel.FK_Points_PointTypes" ManuallyRouted="false" />
         <AssociationConnector Association="PointDocumentationModel.FK_Points_PointTypes1" />
         <AssociationConnector Association="PointDocumentationModel.FK_DocumentHistory_Documents1" />
       </Diagram>

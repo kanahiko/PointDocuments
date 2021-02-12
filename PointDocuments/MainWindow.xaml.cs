@@ -17,98 +17,107 @@ namespace PointDocuments
 {
     public partial class MainWindow : Window
     {
+        PointsPage pointsPage;
 
-        Dictionary<int,TabItem> clickedPoints = new Dictionary<int, TabItem>();
-
-        //List<string> points = new List<string>();
+        bool wasInitialized;
+        TypesPage typesPage;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            DocumentsPage page = new DocumentsPage(-1);
-            DocumentsFrame.Content = page;
-
-            DatabaseHandler.Initialize();
-            PointsList.ItemsSource = DatabaseHandler.GetPointsList();
-
-            DatabaseHandler.CreatePoint("TEST", 4);
-
-            //AddNewPointGrid.Visibility = Visibility.Collapsed;
-
+            wasInitialized = false;
         }
 
-        private void OnPointSelected(object sender, MouseButtonEventArgs e)
+        private void Window_Activated(object sender, EventArgs e)
         {
-            int pointId = DatabaseHandler.GetPointId(PointsList.SelectedIndex);
-            if (clickedPoints.ContainsKey(pointId) || Tabs.Items.Count >= Util.maxTabs)
+            if (!wasInitialized)
             {
-                return;
+                //Height="675" Width="1200"
+                Visibility = Visibility.Hidden;
+                wasInitialized = true;
+                ConnectionCheckWindow checkWindow = new ConnectionCheckWindow();
+                checkWindow.Owner = this;
+                checkWindow.Closing += CheckWindow_Closing;
+                checkWindow.Show();
+                WindowState = WindowState.Normal;
+                checkWindow.WindowState = WindowState.Normal;
+                checkWindow.Focus();
             }
-            string pointName = PointsList.Items[PointsList.SelectedIndex] as string;
+        }
 
-            TabItem newTabItem = new TabItem
+        private void CheckWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!DatabaseHandler.isTested || !DatabaseHandler.canConnect)
             {
-                Name = pointName + pointId.ToString()
-            };
-           
-            newTabItem.Header = CreateTabHeader(pointName, pointId);
-            clickedPoints.Add(pointId, newTabItem);
+                Close();
+            }
+            else
+            {
+                //puts window into full screen
+                Height = 675;
+                Width = 1200;
+                Top = (SystemParameters.PrimaryScreenHeight - Height) / 2;
+                Left = (SystemParameters.PrimaryScreenWidth - Width) / 2;
+                Visibility = Visibility.Visible;
+                WindowState = WindowState.Normal;
+                Focus();
+                InitializeWindow();
+            }
+            e.Cancel = false;
+        }
 
-            Frame frame = new Frame();
-            newTabItem.Content = frame;
-            PointView newtab = new PointView(pointId);
-            frame.Content = newtab;
-            
-            Tabs.Items.Add(newTabItem);
+        void InitializeWindow()
+        {
+            if (DatabaseHandler.canConnect)
+            {
+                DatabaseHandler.Initialize();
+                Util.startingTabsCount = Tabs.Items.Count;
+
+                typesPage = new TypesPage();
+                TypesFrame.Content = typesPage;
+
+                DocumentsPage page = new DocumentsPage();
+                typesPage.updateDocumentTypesHandler += page.UpdateDocumentType;
+                DocumentsFrame.Content = page;
+                
+
+                pointsPage = new PointsPage(this);
+                typesPage.updatePointTypesHandler += pointsPage.UpdatePointTypes;
+                PointsFrame.Content = pointsPage;
+
+            }
+            else
+            {
+                IsEnabled = false;
+            }
+        }
+
+        public void AddTab(TabItem newTab,PointView pointView){
+            Tabs.Items.Add(newTab);
             Tabs.SelectedIndex = Tabs.Items.Count - 1;
+            typesPage.updatePointTypesHandler += pointView.UpdatePointTypes;
         }
 
-        StackPanel CreateTabHeader(string name, int id)
+
+        public void OnTabClosing(int index, TabItem removeTab, PointView pointView)
         {
-            StackPanel panel = new StackPanel();
-            panel.Height = Util.panelHeight;
-            panel.Orientation = Orientation.Horizontal;
-
-            Label label = new Label();
-            label.Height = Util.panelHeight;
-            label.Padding = Util.rightThickness;
-            label.Content = name;
-
-            Button closeButton = new Button();
-            closeButton.Content = Util.x;
-            closeButton.Height = Util.buttonSize;
-            closeButton.Width = Util.buttonSize;
-            closeButton.Background = Brushes.Transparent;
-            closeButton.FontSize = Util.fontSize;
-            closeButton.Click += (object sender, RoutedEventArgs e) => { OnTabClosing(id); };
-
-
-            panel.Children.Add(label);
-            panel.Children.Add(closeButton);
-
-            return panel;
-        }
-
-        void OnTabClosing(int index)
-        {
-            //TODO: CHECK IF SAVED
-            if (!clickedPoints.ContainsKey(index))
+            if (Tabs.SelectedIndex == index + Util.startingTabsCount)
             {
-                return;
+                Tabs.SelectedIndex = 0;
             }
-            Tabs.Items.Remove(clickedPoints[index]);
-            clickedPoints.Remove(index);
+            //TODO: CHECK IF SAVED
+            Tabs.Items.Remove(removeTab);
+            typesPage.updatePointTypesHandler += pointView.UpdatePointTypes;
         }
 
-        private void MainTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        public void OpenTab(int index)
         {
+            Tabs.SelectedIndex = index + Util.startingTabsCount;
         }
 
-        private void MainTab_MouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
+        public bool CheckCanOpenTab()
         {
-            System.Diagnostics.Debug.WriteLine("test");
-
+            return Tabs.Items.Count >= Util.maxTabs + Util.startingTabsCount;
         }
 
     }

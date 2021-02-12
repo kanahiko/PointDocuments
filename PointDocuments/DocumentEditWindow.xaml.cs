@@ -28,7 +28,7 @@ namespace PointDocuments
         List<DocTable> history;
         int originalDocType;
         string originalName;
-        List<int> addedIds;
+        HashSet<int> addedIds;
         public DocumentEditWindow(int id)
         {
             InitializeComponent();
@@ -41,6 +41,7 @@ namespace PointDocuments
             doctypes = DatabaseHandler.GetDocumentTypes();
             DocTypeCombo.ItemsSource = doctypes;
 
+            addedIds = new HashSet<int>();
             Tuple<int, string> doc = DatabaseHandler.GetDocument(id);
             originalDocType = doc.Item1;
             originalName = doc.Item2;
@@ -50,11 +51,31 @@ namespace PointDocuments
             history = DatabaseHandler.GetDocumentHistory(id);
             PointsCountLabel.Content = $"Связано с {DatabaseHandler.GetPointDocumentCount(id)} точками";
             DocumentHistory.ItemsSource = history;
+
+            if (!DatabaseHandler.userRole.Documents.HasFlag(Permissions.UPDATE))
+            {
+                DocumentName.IsEnabled = false;
+                DocTypeCombo.IsEnabled = false;
+                if (!(DatabaseHandler.userRole.DocumentHistory.HasFlag(Permissions.INSERT) ||
+                    DatabaseHandler.userRole.DocumentHistory.HasFlag(Permissions.UPDATE)))
+                {
+                    CancelChange.Visibility = Visibility.Collapsed;
+                    CancelChange.IsEnabled = false;
+                }
+            }
+
+            if (!DatabaseHandler.userRole.DocumentHistory.HasFlag(Permissions.INSERT))
+            {
+                ChangeDocument.Visibility = Visibility.Collapsed;
+            }
         }
 
         void UpdateHistorytable()
         {
-            history.Add(DatabaseHandler.GetLatestHistory(id));
+            DocTable doc = DatabaseHandler.GetLatestHistory(id);
+            addedIds.Add(doc.id);
+            history.Insert(0,doc);
+            DocumentHistory.Items.Refresh();
         }
 
         private void ChangeDocument_Click(object sender, RoutedEventArgs e)
@@ -71,9 +92,7 @@ namespace PointDocuments
                 filePath = openFileDialog.FileName;
             }
 
-            addedIds = new List<int>();
             DatabaseHandler.CreateDocumentHistrory(id, filePath);
-            //TODO send stuff to database and refresh table
             UpdateHistorytable();
         }
 
@@ -84,8 +103,12 @@ namespace PointDocuments
 
             if (addedIds != null)
             {
-                //TODO delete all added ids
-                
+                for(int i = 0; i < addedIds.Count; i++)
+                {
+                    history.RemoveAt(0);
+                }
+                DocumentHistory.Items.Refresh();
+                DatabaseHandler.DeleteDocumentHistory(addedIds);
             }
         }
 
@@ -93,6 +116,42 @@ namespace PointDocuments
         {
             DatabaseHandler.ChangeDocument(id, DocumentName.Text, (int)DocTypeCombo.SelectedValue);
             e.Cancel = false;
+        }
+
+        private void RestoreButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DocumentHistory.SelectedIndex != -1)
+            {
+                DatabaseHandler.RestoreDocumentHistory(history[DocumentHistory.SelectedIndex].id);
+                UpdateHistorytable();
+            }
+        }
+        private void DownloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DocumentHistory.SelectedIndex != -1)
+            {
+                int index = history[DocumentHistory.SelectedIndex].id;
+                string fileName = DatabaseHandler.GetDocumentHistoryFileName(index);
+                string fileType = fileName.Substring(fileName.LastIndexOf("."));
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.InitialDirectory = "c:\\";
+                saveFileDialog.FileName = fileName;
+                saveFileDialog.RestoreDirectory = true;
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    string filePath = saveFileDialog.FileName;
+                    if (filePath.EndsWith(fileType))
+                    {
+                        filePath = filePath.Substring(0, filePath.Length - fileType.Length);
+                    }
+                    if (filePath.Length > 260 - fileType.Length)
+                    {
+                        filePath = filePath.Substring(0, 260 - fileType.Length);
+                    }
+                    filePath += fileType;
+                    DatabaseHandler.DownloadDocument(index, filePath);
+                }
+            }
         }
     }
 }

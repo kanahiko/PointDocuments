@@ -7,7 +7,7 @@
         mc:Ignorable="d"
          d:DesignHeight="430"  d:DesignWidth="780" Title="Documents">
     <StackPanel Background="White">
-        <Button Content="➕ Добавить новый документ" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2"  Margin="0,0,0,10" Click="Button_Click"/>
+        <Button x:Name="AddDocument" Content="➕ Добавить новый документ" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2"  Margin="0,0,0,10" Click="AddDocumentButton_Click"/>
         <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="DocumentsPanel"  CanVerticallyScroll="True">
             

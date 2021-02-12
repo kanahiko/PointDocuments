@@ -13,25 +13,93 @@ namespace PointDocuments
     /// </summary>
     public partial class DocumentsPage : Page
     {
-        int id;
+        int id = -1;
 
         Dictionary<DataGrid, List<DocTable>> sources;
         Dictionary<int, DataGrid> typeToTable;
+        Dictionary<DataGrid,int> tableToType;
 
         HashSet<int> changesToConnections;
-        public DocumentsPage(int id)
+        Dictionary<int, Expander> typeToExpander;
+
+        bool canDelete;
+        bool canInsert;
+        public DocumentsPage()
+        {
+            InitializeComponent();
+            InitializeWindow();
+        }
+
+        public DocumentsPage(int id,Window owner)
         {
             InitializeComponent();
             this.id = id;
+            owner.Closing += DocumentsPage_Closing;
+            canDelete = DatabaseHandler.userRole.PointDocConnections.HasFlag(Permissions.DELETE);
+            canInsert = DatabaseHandler.userRole.PointDocConnections.HasFlag(Permissions.INSERT);
+            InitializeWindow();
+        }
 
+        void InitializeWindow()
+        {
             sources = new Dictionary<DataGrid, List<DocTable>>();
             typeToTable = new Dictionary<int, DataGrid>();
+            tableToType = new Dictionary<DataGrid, int>();
             changesToConnections = new HashSet<int>();
+            typeToExpander = new Dictionary<int, Expander>();
+            //TODO CHANGE SOMETHING
             DatabaseHandler.Initialize();
+            //Getting sorted categories and then creating expanders for those categories
             var categories = DatabaseHandler.GetSortedCategories();
             foreach (var category in categories)
             {
                 CreateCategory(category);
+            }
+
+            if (!DatabaseHandler.userRole.Documents.HasFlag(Permissions.INSERT))
+            {
+                AddDocument.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        public void UpdateDocumentType()
+        {
+            var categories = DatabaseHandler.GetSortedCategories();
+            HashSet<int> cat = new HashSet<int>();
+            for(int i = 0; i < categories.Count; i++)
+            {
+                if (typeToExpander.ContainsKey(categories[i].id))
+                {
+                    DocumentsPanel.Children.Remove(typeToExpander[categories[i].id]);
+                    DocumentsPanel.Children.Add(typeToExpander[categories[i].id]);
+                }
+                else
+                {
+                    CreateCategory(categories[i]);
+                }
+                cat.Add(categories[i].id);
+            }
+            HashSet<int> removeKeys = new HashSet<int>();
+            foreach(var expandery in typeToExpander)
+            {
+                if (!cat.Contains(expandery.Key))
+                {
+                    if (typeToTable.ContainsKey(expandery.Key)) 
+                    {
+                        var table = typeToTable[expandery.Key];
+                        typeToTable.Remove(expandery.Key);
+                        tableToType.Remove(table);
+                        sources[table] = null;
+                        sources.Remove(table);
+                    }
+                    DocumentsPanel.Children.Remove(typeToExpander[expandery.Key]);
+                    removeKeys.Add(expandery.Key);
+                }
+            }
+
+            foreach(var removeKey in removeKeys)
+            {
+                typeToExpander.Remove(removeKey);
             }
         }
 
@@ -47,6 +115,7 @@ namespace PointDocuments
             expander.Expanded += (object sender, RoutedEventArgs e) => PopulateTable(docType.id, expander);
 
             DocumentsPanel.Children.Add(expander);
+            typeToExpander.Add(docType.id, expander);
         }
 
         void PopulateTable(int docType, Expander expander)
@@ -58,6 +127,8 @@ namespace PointDocuments
 
             expander.Expanded -= (object sender, RoutedEventArgs e) => PopulateTable(docType, expander);            
             List<DocTable> docReal = DatabaseHandler.GetDocTableDocuments(id, docType);
+
+            docReal.AddIndexes();
 
             DataGrid table = Util.CreateDatagrid(id);
             if (id != -1)
@@ -72,6 +143,7 @@ namespace PointDocuments
             table.ItemsSource = docReal;
             expander.Content = table;
             typeToTable.Add(docType, table);
+            tableToType.Add(table, docType);
         }
 
         void UpdateTable(int docType)
@@ -79,6 +151,8 @@ namespace PointDocuments
             if (typeToTable.ContainsKey(docType))
             {
                 sources[typeToTable[docType]].Add(DatabaseHandler.GetLatestDocument(docType, id));
+                sources[typeToTable[docType]].AddIndexes();
+                typeToTable[docType].Items.Refresh();
             }
         }
 
@@ -86,7 +160,7 @@ namespace PointDocuments
         private void Table_MouseDown(object sender, MouseButtonEventArgs e)
         {
             DataGrid table = (DataGrid)sender;
-            if (table.CurrentColumn != null && table.CurrentColumn.DisplayIndex == 3)
+            if (table.CurrentColumn != null && table.CurrentColumn.DisplayIndex == 4)
             {
                 sources[table][table.SelectedIndex].isConnected = !sources[table][table.SelectedIndex].isConnected;
 
@@ -96,40 +170,89 @@ namespace PointDocuments
                 }
                 else
                 {
-                    changesToConnections.Add(sources[table][table.SelectedIndex].id);
+                    if (sources[table][table.SelectedIndex].isConnected && canDelete ||
+                        !sources[table][table.SelectedIndex].isConnected && canInsert)
+                    {
+                        changesToConnections.Add(sources[table][table.SelectedIndex].id);
+                    }
                 }
             }
         }
 
+        /// <summary>
+        /// Editing table row
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Table_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             DataGrid table = (DataGrid)sender;
-            if (table.CurrentCell.Column != null && table.CurrentCell.Column.DisplayIndex != 3)
+            if (table.SelectedIndex !=-1 && table.CurrentCell.Column != null && table.CurrentCell.Column.DisplayIndex != 3)
             {
                 DocumentEditWindow editWindow = new DocumentEditWindow(sources[table][table.SelectedIndex].id);
+                int originalType = tableToType[table];
                 editWindow.Owner = Window.GetWindow(this);
+                editWindow.Closing += (object ss, CancelEventArgs ex) => 
+                { 
+                    EditWindow_Closing(ss, table, table.SelectedIndex, originalType); 
+                    ex.Cancel = false; 
+                };
+                editWindow.ShowInTaskbar = false;
                 editWindow.ShowDialog();
-                //throw new NotImplementedException();
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void EditWindow_Closing(object sender, DataGrid originalTable, int selectedIndex, int originalType)
         {
-            DocumentCreateWindow createWindow = new DocumentCreateWindow(); 
+            DocumentEditWindow editWindow = (DocumentEditWindow)sender;
+
+            DocTable item = sources[originalTable][selectedIndex];
+            int newType = (int)editWindow.DocTypeCombo.SelectedValue;
+            if (newType != originalType)
+            {
+                sources[originalTable].RemoveAt(selectedIndex);
+                sources[originalTable].AddIndexes();
+                originalTable.Items.Refresh();
+                if (typeToTable.ContainsKey(newType))
+                {
+                    sources[typeToTable[newType]].Add(item);
+                    sources[typeToTable[newType]].AddIndexes();
+                    typeToTable[newType].Items.Refresh();
+                }
+                else
+                {
+                    //if there's no table generated then there is no need to add somewhere
+                    return;
+                }
+            }
+            item.name = editWindow.DocumentName.Text;
+            item.date = DatabaseHandler.GetDocumentDate(item.id);
+        }
+
+        private void AddDocumentButton_Click(object sender, RoutedEventArgs e)
+        {
+            DocumentCreateWindow createWindow = new DocumentCreateWindow();
             createWindow.Owner = Window.GetWindow(this);
-            createWindow.Closing += CreateWindow_Closing; 
+            createWindow.Closing += CreateWindow_Closing;
+            createWindow.ShowInTaskbar = false;
             createWindow.ShowDialog();
         }
 
         private void CreateWindow_Closing(object sender, CancelEventArgs e)
         {
-            int type = (int)((DocumentCreateWindow)sender).DocTypeCombo.SelectedValue;
-            UpdateTable(type);
-            e.Cancel = false;
+            if (((DocumentCreateWindow)sender).SavedDocument.IsChecked == true)
+            {
+                int type = (int)((DocumentCreateWindow)sender).DocTypeCombo.SelectedValue;
+                UpdateTable(type);
+                e.Cancel = false;
+            }
         }
 
-        
+        private void DocumentsPage_Closing(object sender, CancelEventArgs e)
+        {
+            DatabaseHandler.ChangePointDocConnection(id, changesToConnections);
+            e.Cancel = false;
+
+        }
     }
 }
-
-

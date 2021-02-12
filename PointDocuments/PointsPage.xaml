@@ -1,0 +1,60 @@
+﻿<Page x:Class="PointDocuments.PointsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:PointDocuments"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="PointsPage">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <DataGrid x:Name="PointsList" ItemsSource="{Binding UpdateSourceTrigger=PropertyChanged}" 
+                              AutoGenerateColumns="False" SelectionMode="Single" SelectionUnit="FullRow" IsReadOnly="true" 
+                              Margin="0,0,0,0" Grid.Column="0" MouseDoubleClick="OnPointSelected" 
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                     ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <DataGrid.Columns>
+                <!--<DataGridTextColumn Header="#" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}"/>-->
+                <DataGridTextColumn Header="#" Binding="{Binding number}"/>
+                <DataGridTextColumn Header="Наименование точки" Binding="{Binding name, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="Группа точки" Binding="{Binding type, UpdateSourceTrigger=PropertyChanged}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Column="1"  Width="200" x:Name="AddNewPointGrid">
+            <Grid >
+                <StackPanel>
+                    <Label Content="Создание новой точки" Margin="10,10,10,0"/>
+                    <Grid Background="White" Margin="10,10,10,0" >
+                        <TextBlock x:Name="NewPointNamePlaceholder" Margin="5,2" Text="Имя новой точки" Padding="0" Foreground="#FF9E9E9E"/>
+                        <TextBox x:Name="NewPointName"  Padding="5,2" Background="{x:Null}" TextChanged="NewPointName_TextChanged"/>
+                    </Grid>
+                    <ComboBox  x:Name="NewPointTypeCombo" Margin="10,10,10,0" Padding="5,2,5,2"
+                      ItemsSource="{Binding pointTypes, UpdateSourceTrigger=PropertyChanged}"
+                      DisplayMemberPath="_Name"
+                      SelectedValuePath="id" IsSynchronizedWithCurrentItem="True"/>
+                    <Button x:Name="CreatePoint" Content="Создать новую точку" Height="21" Margin="10,10,10,0" VerticalAlignment="Top" Click="CreatePoint_Click" IsEnabled="False"/>
+                </StackPanel>
+            </Grid>
+            <Grid x:Name="AddNewPointTypeGrid" Margin="0,10,0,0" Visibility="Collapsed">
+                <StackPanel>
+                    <Label Content="Создание нового типа точки" Margin="10,10,10,0"/>
+                    <TextBox x:Name="NewPointTypeName"  Margin="10,10,10,0" Padding="5,2"/>
+                    <Button x:Name="CreatePointType" Content="Создать новый тип точки" Height="21" Margin="10,10,10,0" VerticalAlignment="Top" Click="CreatePointType_Click"/>
+                </StackPanel>
+            </Grid>
+            <Grid x:Name="AddNewDocTypeGrid" Margin="0,10,0,0" Visibility="Collapsed">
+                <StackPanel>
+                    <Label Content="Создание нового типа документа" Margin="10,10,10,0"/>
+                    <TextBox x:Name="NewDocTypeName"  Margin="10,10,10,0" Padding="5,2"/>
+                    <Button x:Name="CreateDocType" Content="Создать новый тип документа" Height="21" Margin="10,10,10,0" VerticalAlignment="Top" Click="CreateDocType_Click"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Page>

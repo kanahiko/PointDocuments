@@ -9,6 +9,7 @@
     <Property Name="DocumentBinary" Type="varbinary(max)" />
     <Property Name="Date" Type="datetime" Nullable="false" />
     <Property Name="UserName" Type="nvarchar" MaxLength="500" Nullable="false" />
+    <Property Name="DocumentFileName" Type="nvarchar" MaxLength="260" />
   </EntityType>
   <EntityType Name="Documents">
     <Key>
@@ -47,16 +48,6 @@
     </Key>
     <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Name" Type="nvarchar" MaxLength="500" />
-  </EntityType>
-  <EntityType Name="sysdiagrams">
-    <Key>
-      <PropertyRef Name="diagram_id" />
-    </Key>
-    <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-    <Property Name="principal_id" Type="int" Nullable="false" />
-    <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="version" Type="int" />
-    <Property Name="definition" Type="varbinary(max)" />
   </EntityType>
   <Association Name="FK_DocumentHistory_Documents">
     <End Role="Documents" Type="Self.Documents" Multiplicity="1" />
@@ -125,7 +116,6 @@
     <EntitySet Name="PointDocConnections" EntityType="Self.PointDocConnections" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Points" EntityType="Self.Points" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="PointTypes" EntityType="Self.PointTypes" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
     <AssociationSet Name="FK_DocumentHistory_Documents" Association="Self.FK_DocumentHistory_Documents">
       <End Role="Documents" EntitySet="Documents" />
       <End Role="DocumentHistory" EntitySet="DocumentHistory" />

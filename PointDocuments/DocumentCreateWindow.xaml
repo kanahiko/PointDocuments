@@ -26,6 +26,7 @@
                       Padding="5,2,5,2" />
 
             <Button x:Name="SaveDocument" Content="Сохранить документ" Padding="5,2,5,2" Click="SaveDocument_Click"/>
+            <CheckBox x:Name="SavedDocument" Visibility="Collapsed" IsChecked="False"/>
         </StackPanel>
     </Grid>
 </Window>

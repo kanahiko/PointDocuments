@@ -31,6 +31,5 @@ namespace PointDocuments
         public virtual DbSet<PointDocConnection> PointDocConnections { get; set; }
         public virtual DbSet<Point> Points { get; set; }
         public virtual DbSet<PointType> PointTypes { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
     }
 }

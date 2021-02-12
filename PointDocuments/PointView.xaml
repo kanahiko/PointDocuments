@@ -11,10 +11,13 @@
     <Grid Background="White">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="10,10,10,10" CanVerticallyScroll="True">
-                <Label x:Name="PointName" Content="NAME" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"/>
-                <Label x:Name="CategoryName" Content="CATEGORY" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5,0,0,0" Margin="0,0,0,10"/>
+                <TextBox x:Name="PointName" Text="NAME" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold" Padding="5,2" Margin="0,0,0,10" Width="350" KeyUp="PointName_KeyUp" LostFocus="PointName_LostFocus" />
+                <ComboBox x:Name="CategoryCombo" Width="150" HorizontalAlignment="Left" Margin="0,0,0,10" Padding="5,2,5,2"
+                      ItemsSource="{Binding pointTypes, UpdateSourceTrigger=PropertyChanged}"
+                      DisplayMemberPath="_Name"
+                      SelectedValuePath="id" SelectionChanged="CategoryCombo_SelectionChanged"/>
 
-                <Button Content="➕ Добавить новый документ" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2"  Margin="0,0,0,10" Click="Button_Click"/>
+                <Button x:Name="AddDocumentButton" Content="➕ Добавить новый документ" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2"  Margin="0,0,0,10" Click="AddDocumentButton_Click"/>
                 <Label Content="Документы:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <StackPanel x:Name="DocumentsPanel">
                 </StackPanel>

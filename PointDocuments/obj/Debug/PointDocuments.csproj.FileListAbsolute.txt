@@ -33,3 +33,17 @@ D:\work\PointDocuments\PointDocuments\bin\Debug\EntityFramework.SqlServer.xml
 D:\work\PointDocuments\PointDocuments\obj\Debug\PointDocuments.csproj.CopyComplete
 D:\work\PointDocuments\PointDocuments\obj\Debug\Test.g.cs
 D:\work\PointDocuments\PointDocuments\obj\Debug\Test.baml
+D:\work\PointDocuments\PointDocuments\obj\Debug\PointsPage.g.cs
+D:\work\PointDocuments\PointDocuments\obj\Debug\PointsPage.baml
+D:\work\PointDocuments\PointDocuments\obj\Debug\ConnectionCheckWindow.g.cs
+D:\work\PointDocuments\PointDocuments\obj\Debug\ConnectionCheckWindow.baml
+D:\work\PointDocuments\PointDocuments\bin\Debug\System.Buffers.dll
+D:\work\PointDocuments\PointDocuments\bin\Debug\System.Memory.dll
+D:\work\PointDocuments\PointDocuments\bin\Debug\System.Numerics.Vectors.dll
+D:\work\PointDocuments\PointDocuments\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+D:\work\PointDocuments\PointDocuments\bin\Debug\System.Buffers.xml
+D:\work\PointDocuments\PointDocuments\bin\Debug\System.Memory.xml
+D:\work\PointDocuments\PointDocuments\bin\Debug\System.Numerics.Vectors.xml
+D:\work\PointDocuments\PointDocuments\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+D:\work\PointDocuments\PointDocuments\obj\Debug\TypesPage.g.cs
+D:\work\PointDocuments\PointDocuments\obj\Debug\TypesPage.baml

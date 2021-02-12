@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,7 +13,7 @@ namespace PointDocuments
         public static int Width = 800;
 
 
-        public static int maxTabs = 12;
+        public static int maxTabs = 10;
         public static int panelHeight = 18;
         public static string x = "❌";
         public static Thickness zeroThickness = new Thickness(0, 0, 0, 0);
@@ -20,19 +22,82 @@ namespace PointDocuments
         public static int buttonSize = 15;
         public static int fontSize = 9;
 
-        public static DataGrid CreateDatagrid(int id)
+        public static int startingTabsCount = 0;
+
+
+        public static readonly HashSet<string> permissions = new HashSet<string>
+        {
+            "SELECT","UPDATE","INSERT","DELETE"
+        };
+
+        public static void AddIndexes(this List<DocTable> table)
+        {
+            for (int i = 0; i < table.Count; i++)
+            {
+                int index = i + 1;
+                table[i].number = index;
+            }
+        }
+        public static void AddIndexes(this List<PointTable> table)
+        {
+            for (int i = 0; i < table.Count; i++)
+            {
+                int index = i + 1;
+                table[i].number = index;
+            }
+        }
+        public static void AddIndexes(this List<TypeTable> table)
+        {
+            for (int i = 0; i < table.Count; i++)
+            {
+                int index = i + 1;
+                table[i].number = index;
+            }
+        }
+
+        public static void ShowErrorMessage(OkErrorDelegate onOk)
+        {
+            if (MessageBox.Show("Ошибка подключения к базе данных.\n" +
+                "Обратитесь к администратору.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
+            {
+                onOk();
+            }
+        }
+
+        public static DataGrid CreateDatagrid(int id = -1)
         {
             DataGrid table = new DataGrid();
             table.AutoGenerateColumns = false;
             table.CanUserAddRows = false;
             table.CanUserDeleteRows = false;
             table.CanUserSortColumns = true;
+            table.CanUserReorderColumns = false;
             table.SelectionMode = DataGridSelectionMode.Single;
             table.SelectionUnit = DataGridSelectionUnit.FullRow;
+            /*table.LoadingRow += (object sender, DataGridRowEventArgs e) =>
+            {
+                System.Diagnostics.Debug.WriteLine("over here");
+                ((DocTable)e.Row.Item).number = e.Row.GetIndex() + 1;
+            };*/
             table.MaxHeight = 500;
             table.IsReadOnly = true;
+            /*table.LostFocus += (object sender, RoutedEventArgs e) =>
+            {
+                table.UnselectAll();
+            };*/
 
             DataGridTextColumn textColumn = new DataGridTextColumn();
+            textColumn.Header = "#";
+
+            Binding binding = new Binding();
+            /* binding.RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGridRow), 1);
+             binding.Converter = new RowToIndexConverter();*/
+            textColumn.Binding = new Binding("number");
+            table.Columns.Add(textColumn);
+
+            //< DataGridTextColumn Header = "#" Binding = "{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}" />
+
+            textColumn = new DataGridTextColumn();
             textColumn.Header = "Название файла";
             textColumn.Binding = new Binding("name");
             table.Columns.Add(textColumn);
@@ -40,7 +105,9 @@ namespace PointDocuments
 
             textColumn = new DataGridTextColumn();
             textColumn.Header = "Дата изменения";
-            textColumn.Binding = new Binding("date");
+            binding = new Binding("date");
+            binding.StringFormat = "dd.MM.yy HH:mm:ss";
+            textColumn.Binding = binding;
             table.Columns.Add(textColumn);
 
 
@@ -53,8 +120,7 @@ namespace PointDocuments
             {
                 CustomDataGridCheckBoxColumn checkBoxColumn = new CustomDataGridCheckBoxColumn();
                 checkBoxColumn.Header = "Отностится к точке";
-
-                Binding binding = new Binding("isConnected");
+                binding = new Binding("isConnected");
                 checkBoxColumn.Binding = binding;
                 binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                 binding.Mode = BindingMode.TwoWay;
@@ -66,6 +132,38 @@ namespace PointDocuments
         }
     }
 
+    public delegate void OkErrorDelegate();
+    public delegate void UpdateTypes();
+
+/*    public class RowToIndexConverter : System.Windows.Markup.MarkupExtension, IValueConverter
+    {
+        static RowToIndexConverter converter;
+
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            DataGridRow row = value as DataGridRow;
+            if (row != null)
+                return row.GetIndex() + 1;
+            else
+                return -1;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            if (converter == null) converter = new RowToIndexConverter();
+            return converter;
+        }
+
+        public RowToIndexConverter()
+        {
+        }
+    }*/
+
     public class CustomDataGridCheckBoxColumn : DataGridCheckBoxColumn
     {
         protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
@@ -75,126 +173,68 @@ namespace PointDocuments
         }
     }
 
-    public class DocTable : INotifyPropertyChanged
+    [Flags]
+    public enum Permissions
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private int _id;
-        private string _name;
-        private System.DateTime _date;
-        private string _username;
-        private bool _isConnected;
-        public int id
-        {
-            get { return _id; }
-            set
-            {
-                _id = value;
-                this.NotifyPropertyChanged("Enabled");
-            }
-        }
-        public string name
-        {
-            get { return _name; }
-            set
-            {
-                _name = value;
-                this.NotifyPropertyChanged("name");
-            }
-        }
-        public System.DateTime date
-        {
-            get { return _date; }
-            set
-            {
-                _date = value;
-                this.NotifyPropertyChanged("date");
-            }
-        }
-        public string username
-        {
-            get { return _username; }
-            set
-            {
-                _username = value;
-                this.NotifyPropertyChanged("username");
-            }
-        }
-        public bool isConnected
-        {
-            get { return _isConnected; }
-            set
-            {
-                _isConnected = value;
-                this.NotifyPropertyChanged("isCOnnected");
-            }
-        }
-        public DocTable()
-        {
-
-        }
-        public DocTable(int i, string a, System.DateTime b, string c)
-        {
-            id = i;
-            name = a;
-            date = b;
-            username = c;
-        }
-
-        private void NotifyPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-        }
+        None = 0,
+        SELECT = 1,
+        UPDATE = 2,
+        INSERT = 4,
+        DELETE =8
     }
 
-    public partial class Document
+    public class UserRole
     {
-        public Document(string name, int doctype) 
-        {
-            Name = name;
-            DocType = doctype;
-        }
-    }
-    public partial class DocumentHistory
-    {
-        public DocumentHistory(int docID, byte[] file, System.DateTime date, string userName)
-        {
-            DocumentID = docID;
-            DocumentBinary = file;
-            Date = date;
-            UserName = userName;
-        }
-    }
-    public partial class Point
-    {
-        public Point(string name, int type)
-        {
-            Name = name;
-            CategoryID = type;
-        }
-    }
-    public partial class PointType
-    {
-        public PointType(string name)
-        {
-            Name = name;
-        }
-    }
-    public partial class DocumentType
-    {
-        public DocumentType(string name)
-        {
-            Name = name;
-        }
-    }
+        public Permissions DocumentHistory;
+        public Permissions Documents;
+        public Permissions DocumentType;
+        public Permissions PointDocConnections;
+        public Permissions Points;
+        public Permissions PointTypes;
 
-    public partial class PointDocConnection
-    {
-        public PointDocConnection(int pointID, int docID)
+        public void AddPermissions(string table, List<string> permissions)
         {
-            PointID = pointID;
-            DocumentID = docID;
+            Permissions permision = 0;
+            for (int i=0;i< permissions.Count; i++)
+            {
+                switch ((permissions[i][0]))
+                {
+                    case 'S':
+                        permision |= Permissions.SELECT;
+                        break;
+                    case 'U':
+                        permision |= Permissions.UPDATE;
+                        break;
+                    case 'I':
+                        permision |= Permissions.INSERT;
+                        break;
+                    case 'D':
+                        permision |= Permissions.DELETE;
+                        break;
+                }
+            }
+
+            switch (table)
+            {
+                case "DocumentHistory":
+                    DocumentHistory = permision;
+                    break;
+                case "Documents":
+                    Documents = permision;
+                    break;
+                case "DocumentType":
+                    DocumentType = permision;
+                    break;
+                case "PointDocConnections":
+                    PointDocConnections = permision;
+                    break;
+                case "Points":
+                    Points = permision;
+                    break;
+                case "PointTypes":
+                    PointTypes = permision;
+                    break;
+            }
         }
     }
 }

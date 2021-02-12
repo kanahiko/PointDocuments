@@ -19,6 +19,7 @@ namespace PointDocuments
         public byte[] DocumentBinary { get; set; }
         public System.DateTime Date { get; set; }
         public string UserName { get; set; }
+        public string DocumentFileName { get; set; }
     
         public virtual Document Document { get; set; }
     }
