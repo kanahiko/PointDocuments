@@ -9,19 +9,37 @@
       Title="PointView">
 
     <Grid Background="White">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="10,10,10,10" CanVerticallyScroll="True">
-                <TextBox x:Name="PointName" Text="NAME" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold" Padding="5,2" Margin="0,0,0,10" Width="350" KeyUp="PointName_KeyUp" LostFocus="PointName_LostFocus" />
-                <ComboBox x:Name="CategoryCombo" Width="150" HorizontalAlignment="Left" Margin="0,0,0,10" Padding="5,2,5,2"
-                      ItemsSource="{Binding pointTypes, UpdateSourceTrigger=PropertyChanged}"
-                      DisplayMemberPath="_Name"
-                      SelectedValuePath="id" SelectionChanged="CategoryCombo_SelectionChanged"/>
-
-                <Button x:Name="AddDocumentButton" Content="➕ Добавить новый документ" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2"  Margin="0,0,0,10" Click="AddDocumentButton_Click"/>
-                <Label Content="Документы:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <StackPanel x:Name="DocumentsPanel">
-                </StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+        <StackPanel Margin="10,10,10,10" CanVerticallyScroll="True">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10" >
+                <TextBox x:Name="PointName" Text="NAME" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold" 
+                            Padding="5,2" Width="350" KeyUp="PointName_KeyUp" LostFocus="PointName_LostFocus" />
+                <Label Content="Недопустимо пустое имя" Name="NameError"  Margin="0" Padding="3" Foreground="#FFCF0000" Visibility="Hidden"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </StackPanel>
-        </ScrollViewer>
+            <ComboBox x:Name="CategoryCombo" Width="150" HorizontalAlignment="Left" Margin="0,0,0,10" Padding="5,2,5,2"
+                    ItemsSource="{Binding pointTypes, UpdateSourceTrigger=PropertyChanged}"
+                    DisplayMemberPath="_Name"
+                    SelectedValuePath="id" SelectionChanged="CategoryCombo_SelectionChanged"/>
+
+                <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                    <Button x:Name="SavePointButton" Content="Сохранить" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2"  Margin="0,0,20,0" IsEnabled="False" Click="SavePointButton_Click"/>
+                    <Button x:Name="CancelPointButton" Content="Отменить изменения" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2" IsEnabled="False" Click="CancelPointButton_Click" />
+                </StackPanel>
+
+            <Button x:Name="AddDocumentButton" Content="➕ Добавить новый документ" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2"  Margin="0,0,0,10" Click="AddDocumentButton_Click"/>
+            <Label Content="Документы:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <ScrollViewer Grid.Row="1" >
+                <StackPanel x:Name="DocumentsPanel" 
+                    CanVerticallyScroll="True" 
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    ScrollViewer.CanContentScroll="True">
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Page>

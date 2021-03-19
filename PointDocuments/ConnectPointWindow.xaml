@@ -1,0 +1,26 @@
+﻿<Window x:Class="PointDocuments.ConnectPointWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PointDocuments"
+        mc:Ignorable="d" Name ="ConnectionWindow"
+        Title="Присоеденить точки к документу" Height="450" Width="450" Closing="ConnectionWindow_Closing" WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <DataGrid Name="ConnectedDataGrid" Margin="10,10,10,10" 
+                  AutoGenerateColumns="False" SelectionMode="Single" SelectionUnit="FullRow" IsReadOnly="true" 
+                  PreviewMouseUp="ConnectedDataGrid_Click" MouseDown="ConnectedDataGrid_Click" RowStyle="{StaticResource DataGridChangingColorStyle}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Наименование точки" Binding="{Binding name}"/>
+                <DataGridTextColumn Header="Группа точки" Binding="{Binding type}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

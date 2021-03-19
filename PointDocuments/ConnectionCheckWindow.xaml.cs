@@ -21,7 +21,7 @@ namespace PointDocuments
         public ConnectionCheckWindow()
         {
             InitializeComponent();
-
+            ShowInTaskbar = false;
             DatabaseHandler.isTested = false;
         }
 

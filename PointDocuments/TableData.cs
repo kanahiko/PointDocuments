@@ -36,6 +36,16 @@ namespace PointDocuments
         private System.DateTime _date;
         private string _username;
         private bool _isConnected;
+
+        public string downloadButtonName
+        {   
+            get { return _id != -1 ? "Скачать документ" : "Открыть в проводнике"; }
+        }
+
+        public System.Windows.Visibility restoreButtonVisibility
+        {
+            get { return _id != -1 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed; }
+        }
         public int id
         {
             get { return _id; }
@@ -117,6 +127,7 @@ namespace PointDocuments
         private string _name;
         private string _type;
         private int _typeID;
+        private bool _isConnected;
         public int id
         {
             get { return _id; }
@@ -150,6 +161,15 @@ namespace PointDocuments
             {
                 _type = value;
                 this.NotifyPropertyChanged("type");
+            }
+        }
+        public bool isConnected
+        {
+            get { return _isConnected; }
+            set
+            {
+                _isConnected = value;
+                this.NotifyPropertyChanged("isConnected");
             }
         }
         public int typeID

@@ -24,6 +24,13 @@
                 <DataGridTextColumn Header="#" Binding="{Binding number}"/>
                 <DataGridTextColumn Header="Наименование точки" Binding="{Binding name, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTextColumn Header="Группа точки" Binding="{Binding type, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTemplateColumn Header="Удалить" IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button x:Name="DeletePointButton" Content="Удалить" Click="DeletePointButton_Click" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Grid.Column="1"  Width="200" x:Name="AddNewPointGrid">
@@ -39,20 +46,6 @@
                       DisplayMemberPath="_Name"
                       SelectedValuePath="id" IsSynchronizedWithCurrentItem="True"/>
                     <Button x:Name="CreatePoint" Content="Создать новую точку" Height="21" Margin="10,10,10,0" VerticalAlignment="Top" Click="CreatePoint_Click" IsEnabled="False"/>
-                </StackPanel>
-            </Grid>
-            <Grid x:Name="AddNewPointTypeGrid" Margin="0,10,0,0" Visibility="Collapsed">
-                <StackPanel>
-                    <Label Content="Создание нового типа точки" Margin="10,10,10,0"/>
-                    <TextBox x:Name="NewPointTypeName"  Margin="10,10,10,0" Padding="5,2"/>
-                    <Button x:Name="CreatePointType" Content="Создать новый тип точки" Height="21" Margin="10,10,10,0" VerticalAlignment="Top" Click="CreatePointType_Click"/>
-                </StackPanel>
-            </Grid>
-            <Grid x:Name="AddNewDocTypeGrid" Margin="0,10,0,0" Visibility="Collapsed">
-                <StackPanel>
-                    <Label Content="Создание нового типа документа" Margin="10,10,10,0"/>
-                    <TextBox x:Name="NewDocTypeName"  Margin="10,10,10,0" Padding="5,2"/>
-                    <Button x:Name="CreateDocType" Content="Создать новый тип документа" Height="21" Margin="10,10,10,0" VerticalAlignment="Top" Click="CreateDocType_Click"/>
                 </StackPanel>
             </Grid>
         </StackPanel>

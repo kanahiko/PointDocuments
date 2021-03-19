@@ -41,9 +41,54 @@ namespace PointDocuments
                        var results = GetPermission(userName,tables[j], allPermissions[i]);
                     }*/
                 }
+
+#if DEBUG
+                FillTable();
+#endif
             }
         }
+#if DEBUG
+        public class Conv
+        {
+            public string name;
+            public byte[] binary;
+        }
 
+        static void FillTable()
+        {
+            /*var notEmpty = databaseContext.DocumentHistories.Where(a => a.DocumentBinary != null).
+                Select(b => new Conv{ name = b.DocumentFileName, binary = b.DocumentBinary }).ToList();
+            //.ToDictionary(t => t.name,t => t.binary)
+            var empty = databaseContext.DocumentHistories.Where(a => a.DocumentBinary == null).ToList();
+
+            for(int i = 0; i < empty.Count; i++)
+            {
+                databaseContext.Entry(empty[i]).State = System.Data.Entity.EntityState.Modified;
+                databaseContext.Entry(empty[i]).Property(x => x.DocumentID).IsModified = false;
+                databaseContext.Entry(empty[i]).Property(x => x.Date).IsModified = false;
+                databaseContext.Entry(empty[i]).Property(x => x.UserName).IsModified = false;
+
+                int index = 0;
+                for(int j = 0; j < notEmpty.Count; j++)
+                {
+                    if (empty[i].DocumentFileName == notEmpty[j].name)
+                    {
+                        index = j;
+                        break;
+                    }
+                }
+                empty[i].DocumentFileName = notEmpty[index].name;
+                empty[i].DocumentBinary = notEmpty[index].binary;
+            }*/
+            /*
+                        var query = from p in databaseContext.Documents
+                                    let t = databaseContext.DocumentHistories.Where(pt => pt.id == p.CategoryID).FirstOrDefault()
+                                    select new PointTable { id = p.id, name = p.Name, type = t.Name, typeID = t.id };
+
+                        databaseContext.SaveChanges();
+                        databaseContext = new PointDocumentationEntities();*/
+        }
+#endif
         public static bool CheckCanDeleteDocumentType(int docID)
         {
             return !databaseContext.Documents.Where(a => a.DocType == docID).Any();
@@ -102,6 +147,15 @@ namespace PointDocuments
             }
 
             return points;
+        }
+        public static List<PointTable> GetPointsList(int docID)
+        {
+            var query = from p in databaseContext.Points.OrderBy(pp => pp.Name)
+                        let t = databaseContext.PointTypes.Where(pt => pt.id == p.CategoryID).FirstOrDefault()
+                        let pd = databaseContext.PointDocConnections.Where(pdpd => pdpd.PointID == p.id && pdpd.DocumentID == docID)
+                        select new PointTable { id = p.id, name = p.Name,type = t.Name,isConnected = pd.Any() };
+
+            return query.ToList();
         }
 
 
@@ -293,6 +347,10 @@ namespace PointDocuments
         {
             return databaseContext.PointDocConnections.Where(a => a.DocumentID == docID).Count();
         }
+        public static int GetDocumentPointCount(int pointID)
+        {
+            return databaseContext.PointDocConnections.Where(a => a.PointID == pointID).Count();
+        }
         //------------------------------------CHANGING ENTRIES-------------------------------------------------
         //==============DOCUMENT HISTORY==============
         public static void CreateDocumentHistrory(int id, string filePath)
@@ -302,6 +360,18 @@ namespace PointDocuments
             string fileName = filePath.Substring(filePath.LastIndexOf("\\") + 1);
             DocumentHistory entry;
             entry = new DocumentHistory(id, file, DateTime.Now, userName, fileName);
+
+            databaseContext.DocumentHistories.Add(entry);
+            databaseContext.SaveChanges();
+            databaseContext = new PointDocumentationEntities();
+        }
+
+        public static void CreateDocumentHistrory(int id,string filePath, DateTime newTime)
+        {
+            byte[] file = File.ReadAllBytes(filePath);            
+            string userName = System.Environment.UserName;            
+            string fileName = filePath.Substring(filePath.LastIndexOf("\\") + 1);
+            DocumentHistory entry = new DocumentHistory(id, file, newTime, userName, fileName);
 
             databaseContext.DocumentHistories.Add(entry);
             databaseContext.SaveChanges();
@@ -319,12 +389,12 @@ namespace PointDocuments
             databaseContext.SaveChanges();
             databaseContext = new PointDocumentationEntities();
         }
-        public static void RestoreDocumentHistory(int id)
+        public static void RestoreDocumentHistory(int id, DateTime newTime)
         {
             string userName = System.Environment.UserName;
             DocumentHistory history = databaseContext.DocumentHistories.Where(a => a.id == id).FirstOrDefault();
 
-            DocumentHistory restoredHistory = new DocumentHistory(history.DocumentID, history.DocumentBinary, DateTime.Now, userName, history.UserName);
+            DocumentHistory restoredHistory = new DocumentHistory(history.DocumentID, history.DocumentBinary, newTime, userName, history.UserName);
             databaseContext.DocumentHistories.Add(restoredHistory);
             databaseContext.SaveChanges();
             databaseContext = new PointDocumentationEntities();
@@ -456,6 +526,25 @@ namespace PointDocuments
         public static void ChangePointDocConnection(int pointID, HashSet<int> docsID)
         {
             foreach(var docID in docsID)
+            {
+                PointDocConnection connection = databaseContext.PointDocConnections.Where(a => a.DocumentID == docID && a.PointID == pointID).FirstOrDefault();
+                if (connection == null)
+                {
+                    connection = new PointDocConnection(pointID, docID);
+                    databaseContext.PointDocConnections.Add(connection);
+                }
+                else
+                {
+                    databaseContext.Entry(connection).State = System.Data.Entity.EntityState.Deleted;
+                }
+
+            }
+            databaseContext.SaveChanges();
+            databaseContext = new PointDocumentationEntities();
+        }
+        public static void ChangeDocPointConnection(int docID, HashSet<int> pointsID)
+        {
+            foreach (var pointID in pointsID)
             {
                 PointDocConnection connection = databaseContext.PointDocConnections.Where(a => a.DocumentID == docID && a.PointID == pointID).FirstOrDefault();
                 if (connection == null)

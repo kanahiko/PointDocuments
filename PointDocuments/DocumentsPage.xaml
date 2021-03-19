@@ -5,13 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PointDocuments"
         mc:Ignorable="d"
-         d:DesignHeight="430"  d:DesignWidth="780" Title="Documents">
-    <StackPanel Background="White">
+        d:DesignHeight="430"  d:DesignWidth="780" Title="Documents">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Button x:Name="AddDocument" Content="➕ Добавить новый документ" HorizontalAlignment="Left" Width="Auto" Padding="5,2,5,2"  Margin="0,0,0,10" Click="AddDocumentButton_Click"/>
-        <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <StackPanel x:Name="DocumentsPanel"  CanVerticallyScroll="True">
+        <ScrollViewer Grid.Row="1">
+            <StackPanel x:Name="DocumentsPanel"  
+            CanVerticallyScroll="True" 
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+             ScrollViewer.CanContentScroll="True" >
             
             </StackPanel>
         </ScrollViewer>
-    </StackPanel>
+    </Grid>
 </Page>

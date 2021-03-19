@@ -81,6 +81,9 @@
     <Compile Include="ConnectionCheckWindow.xaml.cs">
       <DependentUpon>ConnectionCheckWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ConnectPointWindow.xaml.cs">
+      <DependentUpon>ConnectPointWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseHandler.cs" />
     <Compile Include="DatabaseModelExtender.cs" />
     <Compile Include="Document.cs">
@@ -141,6 +144,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ConnectPointWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DocumentCreateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -178,6 +185,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PointView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

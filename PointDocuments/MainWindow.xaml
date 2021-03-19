@@ -7,8 +7,20 @@
         mc:Ignorable="d"
         Title="Документо точковые дела" Height="150" Width="186" WindowStartupLocation="CenterScreen" Visibility="Visible" Activated="Window_Activated" HorizontalAlignment="Center" VerticalAlignment="Center">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
-        <!--Header="Выбор точек"-->
+        <!--<Grid.ContextMenu>
+            <ContextMenu>
+                <CheckBox Content="Использовать вкладки для точек" IsChecked="False" Name="TabCheckBox" Click="TabCheckBox_Click"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
+       Header="Выбор точек"-->
         <TabControl x:Name="Tabs" Margin="10,10,10,10">
             <TabItem x:Name="MainTab" Padding="5,0,5,0">
                 <TabItem.Header>
@@ -18,10 +30,10 @@
                 </TabItem.Header>
                 <TabItem.Background>
                     <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                        <GradientStop Color="#FFB8FBC7" Offset="0"/>
-                        <GradientStop Color="#FF26AA44" Offset="1"/>
+                        <GradientStop Color="#FFFBB8B8" Offset="0"/>
+                        <GradientStop Color="#FFAA2626" Offset="1"/>
                     </LinearGradientBrush>
-                </TabItem.Background>
+                </TabItem.Background>                
                 <Frame x:Name="PointsFrame"  Margin="10,10,10,10"/>
             </TabItem>
             <TabItem x:Name="DocTab" Padding="5,0,5,0">
@@ -32,8 +44,8 @@
                 </TabItem.Header>
                 <TabItem.Background>
                     <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                        <GradientStop Color="#FFFBB8B8" Offset="0"/>
-                        <GradientStop Color="#FFAA2626" Offset="1"/>
+                        <GradientStop Color="#FFB8FBC7" Offset="0"/>
+                        <GradientStop Color="#FF26AA44" Offset="1"/>
                     </LinearGradientBrush>
                 </TabItem.Background>
                 <Frame x:Name="DocumentsFrame" Margin="10,10,10,10" />
@@ -47,7 +59,7 @@
                 <TabItem.Background>
                     <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                         <GradientStop Color="#FFB8C1FB" Offset="0"/>
-                        <GradientStop Color="#FF4A26AA" Offset="1"/>
+                        <GradientStop Color="#FF264AAA" Offset="1"/>
                     </LinearGradientBrush>
                 </TabItem.Background>
                 <Frame x:Name="TypesFrame" Margin="10,10,10,10" />

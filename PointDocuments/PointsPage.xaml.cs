@@ -25,8 +25,10 @@ namespace PointDocuments
         Dictionary<int, TabItem> clickedPoints = new Dictionary<int, TabItem>();
         List<TabItem> orderedTabs = new List<TabItem>();
 
-        Update updateHandler;
-        Add addhandler;
+        bool isUsingTabs = false;
+
+        //Update updateHandler;
+        //Add addhandler;
         //Update handler;
 
         List<PointType> pointTypes;
@@ -37,8 +39,7 @@ namespace PointDocuments
             PointsList.ItemsSource = DatabaseHandler.GetPointsList();
             this.mainWindow = mainWindow;
 
-            updateHandler = UpdatePoint;
-            addhandler = AddPoint;
+            //addhandler = AddPoint;
 
             NewPointTypeCombo.ItemsSource = DatabaseHandler.GetPointTypes();
             NewPointTypeCombo.SelectedIndex = 0;
@@ -59,14 +60,6 @@ namespace PointDocuments
 
             DatabaseHandler.GetPointsList(true);
             PointsList.Items.Refresh();
-            /*for (int i=0;i< points.Count; i++)
-            {
-                if (points[i].typeID == pointTypeID)
-                {
-                    points[i].typeID = pointTypeID;
-                    points[i].typeID = pointTypeID;
-                }
-            }*/
         }
 
         private void OnPointSelected(object sender, MouseButtonEventArgs e)
@@ -76,10 +69,56 @@ namespace PointDocuments
                 return;
             }
             e.Handled = true;
-            int pointId = DatabaseHandler.GetPointsList()[PointsList.SelectedIndex].id;
-            if (clickedPoints.ContainsKey(pointId))
+            int pointID = DatabaseHandler.GetPointsList()[PointsList.SelectedIndex].id;            
+            string pointName = DatabaseHandler.GetPointsList()[PointsList.SelectedIndex].name;
+
+            
+
+            Frame frame = new Frame();
+            PointView view = new PointView(pointID);
+            view.updater += UpdatePoint;
+            frame.Content = view;
+
+            if (isUsingTabs)
             {
-                int index = orderedTabs.FindIndex(a => a == clickedPoints[pointId]);
+                CreatePointTab(pointID, pointName, view, frame);
+            }
+            else
+            {
+                CreatePointWindow(pointID, pointName, view, frame);
+            }
+
+
+            PointsList.SelectedIndex = -1;
+            //TODO Tell main window to select add and select tab
+        }
+
+        void CreatePointWindow(int pointID,string pointName, PointView view, Frame frame)
+        {
+            Window window = new Window();
+            window.Owner = Window.GetWindow(this);
+            window.Title = pointName;
+            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            window.Height = Util.BigHeight;
+            window.Width = Util.BigWidth;
+
+
+            frame.Margin = Util.borderThickness;
+            window.Content = frame;
+            window.Owner = Window.GetWindow(this);
+            window.Closing += (sender, e) =>
+            {
+                e.Cancel = OnTabClosing(pointID, view);
+            };
+            window.ShowInTaskbar = false;
+            window.ShowDialog();
+        }
+
+        void CreatePointTab(int pointID, string pointName, PointView view, Frame frame)
+        {
+            if (clickedPoints.ContainsKey(pointID))
+            {
+                int index = orderedTabs.FindIndex(a => a == clickedPoints[pointID]);
                 if (index == -1)
                 {
                     return;
@@ -93,26 +132,16 @@ namespace PointDocuments
             {
                 return;
             }
-            string pointName = DatabaseHandler.GetPointsList()[PointsList.SelectedIndex].name;
 
             TabItem newTabItem = new TabItem
             {
-                Name = "Point" + pointId.ToString()
+                Name = "Point" + pointID.ToString()
             };
-
-            Frame frame = new Frame();
             newTabItem.Content = frame;
-            PointView newtab = new PointView(pointId, updateHandler);
-            frame.Content = newtab;
-
-            newTabItem.Header = CreateTabHeader(pointName, pointId, newtab);
-            clickedPoints.Add(pointId, newTabItem);
+            newTabItem.Header = CreateTabHeader(pointName, pointID, view);
+            clickedPoints.Add(pointID, newTabItem);
             orderedTabs.Add(newTabItem);
-
-            PointsList.SelectedIndex = -1;
-            mainWindow.AddTab(newTabItem, newtab);
-            //TODO Tell main window to select add and select tab
-
+            mainWindow.AddTab(newTabItem, view);
         }
 
         StackPanel CreateTabHeader(string name, int id, PointView view)
@@ -138,7 +167,10 @@ namespace PointDocuments
             closeButton.Width = Util.buttonSize;
             closeButton.Background = Brushes.Transparent;
             closeButton.FontSize = Util.fontSize;
-            closeButton.Click += (object sender, RoutedEventArgs e) => { OnTabClosing(id, view); };
+            closeButton.Click += (object sender, RoutedEventArgs e) => 
+            {
+                 OnTabClosing(id, view);
+            };
 
 
             panel.Children.Add(label);
@@ -147,17 +179,25 @@ namespace PointDocuments
             return panel;
         }
 
-        public void OnTabClosing(int index, PointView view)
+        public bool OnTabClosing(int index, PointView view)
         {
-            //TODO: CHECK IF SAVED
-            if (!clickedPoints.ContainsKey(index))
+            if (view.CloseTab())
             {
-                return;
+                //TODO: CHECK IF SAVED
+                if (isUsingTabs)
+                {
+                    if (!clickedPoints.ContainsKey(index))
+                    {
+                        return true;
+                    }
+                    mainWindow.OnTabClosing(orderedTabs.FindIndex(a => a == clickedPoints[index]), clickedPoints[index], view);
+                    orderedTabs.Remove(clickedPoints[index]);
+                    clickedPoints.Remove(index);
+                    view.Dispose();
+                }
+                return false;
             }
-            mainWindow.OnTabClosing(orderedTabs.FindIndex(a => a == clickedPoints[index]),clickedPoints[index], view);
-            orderedTabs.Remove(clickedPoints[index]);
-            clickedPoints.Remove(index);
-            view.Dispose();
+            return true;
         }
 
         public void UpdatePoint(int id, string name, int newType)
@@ -169,26 +209,18 @@ namespace PointDocuments
             PointsList.Items.Refresh();
         }
 
-        public void AddPoint()
+        public void UpdatePoints()
         {
             DatabaseHandler.GetPointsList(true);
             //points.Add(DatabaseHandler.GetNewPoint());
             PointsList.Items.Refresh();
         }
 
-        private void CreatePointType_Click(object sender, RoutedEventArgs e)
-        {
-            DatabaseHandler.CreateNewPointType(NewPointTypeName.Text);
-        }
-
-        private void CreateDocType_Click(object sender, RoutedEventArgs e)
-        {
-            DatabaseHandler.CreateNewDocType(NewDocTypeName.Text);
-        }
 
         private void CreatePoint_Click(object sender, RoutedEventArgs e)
         {
             DatabaseHandler.CreatePoint(NewPointName.Text, (int)NewPointTypeCombo.SelectedValue);
+            UpdatePoints();
             NewPointName.Text = "";
         }
 
@@ -205,6 +237,26 @@ namespace PointDocuments
                 CreatePoint.IsEnabled = false;
             }
         }
+
+        private void DeletePointButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (PointsList.SelectedItem != null) 
+            {
+                if (DatabaseHandler.GetDocumentPointCount(((PointTable)PointsList.SelectedItem).id) == 0)
+                { if (MessageBox.Show($"Вы точно хотите удалить точку \"{((PointTable)PointsList.SelectedItem).name}\"?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                    {
+                        DatabaseHandler.DeletePoint(((PointTable)PointsList.SelectedItem).id);
+                        UpdatePoints();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"Невозможно удалить \"{((PointTable)PointsList.SelectedItem).name}\". Привязано к документам.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+            }
+        }
+
     }
     public delegate void Update(int id, string name, int newType);
     public delegate void Add();

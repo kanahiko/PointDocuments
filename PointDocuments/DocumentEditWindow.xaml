@@ -11,41 +11,59 @@
         <StackPanel  Margin="10,10,10,10" ScrollViewer.VerticalScrollBarVisibility="Auto" CanVerticallyScroll="True">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                 <Label  Content="Имя документа" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <TextBox x:Name="DocumentName" Width="350" Text="" Padding="5,2"/>
+                <TextBox x:Name="DocumentName" Width="350" Text="" Padding="5,2" LostFocus="DocumentName_LostFocus" KeyUp="DocumentName_KeyUp"/>
+                <Label  Content="Недопустимо пустое имя" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FFCF0000" Name="ErrorDocumentName" Visibility="Hidden"/>
             </StackPanel>
             <ComboBox x:Name="DocTypeCombo" Width="150" HorizontalAlignment="Left" Margin="0,0,0,10" Padding="5,2,5,2"
                       ItemsSource="{Binding docTypes}"
                       DisplayMemberPath="Name"
-                      SelectedValuePath="id"/>
+                      SelectedValuePath="id" SelectionChanged="DocTypeCombo_SelectionChanged"/>
+            <StackPanel  Margin="0,0,0,10" Orientation="Horizontal">
+                <Button x:Name="SaveButton" Content="Сохранить" Padding="5,2,5,2" HorizontalAlignment="Left" Margin="0,0,20,0" Width="Auto" Click="SaveButton_Click" IsEnabled="False"/>
+                <Button x:Name="CancelButton" Content="Отменить" Padding="5,2,5,2" HorizontalAlignment="Left" Width="Auto" Click="CancelButton_Click"  IsEnabled="False"/>
+            </StackPanel>
 
             <Label x:Name="PointsCountLabel" Content="Связано с 0 точками" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-            <Button x:Name="ChangeDocument" Content="➕ Добавить новую версию документа" Padding="5,2,5,2" HorizontalAlignment="Left" Margin="0,0,0,10" Width="Auto" Click="ChangeDocument_Click"/>
+            <Button x:Name="AddPoints" Content="Добавить документ в точки" Padding="5,2,5,2" HorizontalAlignment="Left" Margin="0,0,0,20" Width="Auto" Click="AddPoints_Click"/>
+            <Button x:Name="ChangeDocument" Content="➕ Добавить новую версию документа" Padding="5,2,5,2" HorizontalAlignment="Left" Margin="0,0,0,0" Width="Auto" Click="ChangeDocument_Click"/>
             <Label Content="История изменений:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
             <DataGrid x:Name="DocumentHistory" Margin="0,0,0,10" 
                       AutoGenerateColumns="False" SelectionMode="Single" SelectionUnit="FullRow" IsReadOnly="true" EnableRowVirtualization="False">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding id}" Value="-1">
+                                <Setter Property="Background" Value="#FF7BFFB1"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+
                 <DataGrid.Columns>
-                    <!--<DataGridTextColumn Header="#" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}"/>-->
-                    <!--<DataGridTextColumn Header="Название файла" Binding="{Binding Name}"/>-->
-                    <DataGridTextColumn Header="Дата изменения" Binding="{Binding date}"/>
+                    <DataGridTextColumn x:Name="idColumn" Header="id" Binding="{Binding id}" Visibility="Collapsed"/>
+                    <DataGridTextColumn x:Name="DateColumn" Header="Дата изменения" Binding="{Binding date}"/>
                     <DataGridTextColumn Header="Пользователь" Binding="{Binding username}"/>
-                    <DataGridTemplateColumn Header="Восстановить документ">
+                    <DataGridTemplateColumn x:Name="RestoreButtonColumn" Header="Восстановить документ">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button x:Name="RestoreButton" Content="Восстановить документ" Padding="5,2" Click="RestoreButton_Click"/>
+                                <Button x:Name="RestoreButton" Content="Восстановить документ" Padding="5,2" Click="RestoreButton_Click" Visibility="{Binding restoreButtonVisibility}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Скачать документ">
+                    <DataGridTemplateColumn x:Name="DownloadButtonColumn" Header="Скачать документ" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button x:Name="DownloadButton" Content="Скачать документ" Padding="5,2" Click="DownloadButton_Click"/>
+                                <Button x:Name="DownloadButton" Content="{Binding downloadButtonName}" Padding="5,2" Click="DownloadButton_Click"/>
                             </DataTemplate>
+                            <!--Content="Скачать документ"-->
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-
-            <Button x:Name="CancelChange" Content="Отменить текущие изменения" Padding="5,2,5,2" HorizontalAlignment="Left" Margin="0,0,0,10" Width="Auto" Click="CancelChange_Click"/>
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="SaveHistoryChange" Content="Сохранить изменения в истории" Padding="5,2,5,2" HorizontalAlignment="Left" Margin="0,0,30,0" Width="Auto" Click="SaveHistoryChange_Click"  IsEnabled="False"/>
+                <Button x:Name="CancelChange" Content="Отменить текущие изменения в истории" Padding="5,2,5,2" HorizontalAlignment="Left" Width="Auto" Click="CancelChange_Click"  IsEnabled="False"/>
+            </StackPanel>
         </StackPanel>
 
     </Grid>

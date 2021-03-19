@@ -11,6 +11,8 @@ namespace PointDocuments
     {
         public static int Height = 450;
         public static int Width = 800;
+        public static int BigHeight = 675;
+        public static int BigWidth = 1200;
 
 
         public static int maxTabs = 10;
@@ -79,6 +81,14 @@ namespace PointDocuments
                 System.Diagnostics.Debug.WriteLine("over here");
                 ((DocTable)e.Row.Item).number = e.Row.GetIndex() + 1;
             };*/
+            Style style = (Style)Application.Current.MainWindow.TryFindResource("DataGridChangingColorStyle");
+            table.RowStyle = style;
+            /*< DataTrigger Binding = "{Binding State}" Value = "State1" >    
+                    < Setter Property = "Background" Value = "Red" ></ Setter >       
+                    </ DataTrigger >
+            < DataTrigger Binding = "{Binding State}" Value = "State2" >          
+             < Setter Property = "Background" Value = "Green" ></ Setter >
+            </ DataTrigger > */
             table.MaxHeight = 500;
             table.IsReadOnly = true;
             /*table.LostFocus += (object sender, RoutedEventArgs e) =>

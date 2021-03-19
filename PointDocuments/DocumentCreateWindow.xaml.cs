@@ -48,6 +48,7 @@ namespace PointDocuments
                 string path = filePath.Substring(filePath.LastIndexOf("\\") + 1);
                 FileNameLabel.Text = path;
                 FileNameLabel.Foreground = Brushes.Black;
+                DocName.Text = path.Substring(0, path.LastIndexOf("."));
 
                 SaveDocument.IsEnabled = true;
             }

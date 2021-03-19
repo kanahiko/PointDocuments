@@ -47,3 +47,6 @@ D:\work\PointDocuments\PointDocuments\bin\Debug\System.Numerics.Vectors.xml
 D:\work\PointDocuments\PointDocuments\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 D:\work\PointDocuments\PointDocuments\obj\Debug\TypesPage.g.cs
 D:\work\PointDocuments\PointDocuments\obj\Debug\TypesPage.baml
+D:\work\PointDocuments\PointDocuments\obj\Debug\ConnectPointWindow.g.cs
+D:\work\PointDocuments\PointDocuments\obj\Debug\ConnectPointWindow.baml
+D:\work\PointDocuments\PointDocuments\obj\Debug\Styles.baml

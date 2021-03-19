@@ -24,6 +24,8 @@ namespace PointDocuments
 
         bool canDelete;
         bool canInsert;
+
+        public Add updaterOfPoints;
         public DocumentsPage()
         {
             InitializeComponent();
@@ -160,7 +162,7 @@ namespace PointDocuments
         private void Table_MouseDown(object sender, MouseButtonEventArgs e)
         {
             DataGrid table = (DataGrid)sender;
-            if (table.CurrentColumn != null && table.CurrentColumn.DisplayIndex == 4)
+            if (table.SelectedIndex != -1 && table.CurrentColumn != null && table.CurrentColumn.DisplayIndex == 4)
             {
                 sources[table][table.SelectedIndex].isConnected = !sources[table][table.SelectedIndex].isConnected;
 
@@ -192,10 +194,13 @@ namespace PointDocuments
                 DocumentEditWindow editWindow = new DocumentEditWindow(sources[table][table.SelectedIndex].id);
                 int originalType = tableToType[table];
                 editWindow.Owner = Window.GetWindow(this);
-                editWindow.Closing += (object ss, CancelEventArgs ex) => 
-                { 
-                    EditWindow_Closing(ss, table, table.SelectedIndex, originalType); 
-                    ex.Cancel = false; 
+                editWindow.Closing += (object ss, CancelEventArgs ex) =>
+                {
+                    if (!ex.Cancel)
+                    {
+                        EditWindow_Closing(ss, table, table.SelectedIndex, originalType);
+                        updaterOfPoints?.Invoke();
+                    }
                 };
                 editWindow.ShowInTaskbar = false;
                 editWindow.ShowDialog();
@@ -227,6 +232,9 @@ namespace PointDocuments
             }
             item.name = editWindow.DocumentName.Text;
             item.date = DatabaseHandler.GetDocumentDate(item.id);
+
+
+            //TODO UPDATE POINTS
         }
 
         private void AddDocumentButton_Click(object sender, RoutedEventArgs e)

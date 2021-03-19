@@ -28,15 +28,19 @@ namespace PointDocuments
         Dictionary<int,Expander> categories;
 
         public List<PointType> pointTypes;
-        Update updater;
+        public Update updater;
 
         public TabLabel tabLabel;
-        public PointView(int id, Update updater)
+
+        string origName;
+        int origType;
+
+        bool isDirty;
+        public PointView(int id)
         {
             InitializeComponent();
 
             this.id = id;
-            this.updater = updater;
 
 
             typeToTable = new Dictionary<int, DataGrid>();
@@ -46,6 +50,8 @@ namespace PointDocuments
             CategoryCombo.ItemsSource = pointTypes;
 
             Point point = DatabaseHandler.GetPoint(id);
+            origName = point.Name;
+            origType = point.CategoryID;
             PointName.Text = point.Name;
             tabLabel = new TabLabel();
             tabLabel.tabName = point.Name;
@@ -65,6 +71,9 @@ namespace PointDocuments
                 CategoryCombo.IsEditable = false;
                 CategoryCombo.IsEnabled = false;
                 PointName.IsEnabled = false;
+                SavePointButton.Visibility = Visibility.Collapsed;
+                CancelPointButton.Visibility = Visibility.Collapsed;
+
             }
 
             if (!DatabaseHandler.userRole.PointDocConnections.HasFlag(Permissions.INSERT) &&
@@ -72,6 +81,8 @@ namespace PointDocuments
             {
                 AddDocumentButton.Visibility = Visibility.Collapsed;
             }
+
+            isDirty = false;
         }
 
         public void UpdatePointTypes()
@@ -130,6 +141,7 @@ namespace PointDocuments
             DocumentEditWindow editWindow = new DocumentEditWindow(item.id);
             editWindow.Owner = Window.GetWindow(this);
             editWindow.ShowInTaskbar = false;
+            editWindow.Closing += (sender, e) => { if (!e.Cancel) { UpdateCategories(); } };
             editWindow.ShowDialog();
         }
 
@@ -161,8 +173,9 @@ namespace PointDocuments
             e.Cancel = false;
         }
 
-        void UpdateCategories()
+        public void UpdateCategories()
         {
+            System.Diagnostics.Debug.WriteLine("ddddasdasdasddd");
             docPoint = DatabaseHandler.GetDocumentsID(id);
             List<DocumentType> sortedCategories = DatabaseHandler.GetSortedCategories(id, docPoint);
             foreach (var category in sortedCategories)
@@ -217,9 +230,19 @@ namespace PointDocuments
         {
             if (CategoryCombo.SelectedIndex != -1)
             {
-                DatabaseHandler.ChangePoint(id, PointName.Text, (int)CategoryCombo.SelectedValue);
-                //how to update main table?
-                updater(id, PointName.Text, (int)CategoryCombo.SelectedValue);
+                if ((int)CategoryCombo.SelectedValue == origType)
+                {
+                    isDirty = PointName.Text != origName;
+                    if (!isDirty)
+                    {
+                        SavePointButton.IsEnabled = false;
+                        CancelPointButton.IsEnabled = false;
+                    }
+                    return;
+                }
+                isDirty = true;
+                CancelPointButton.IsEnabled = true;
+                SavePointButton.IsEnabled = PointName.Text.Length > 0;
             }
         }
 
@@ -228,19 +251,88 @@ namespace PointDocuments
             if (e.Key == Key.Enter || e.Key == Key.Escape)
             {
                 Keyboard.ClearFocus();
-                DatabaseHandler.ChangePoint(id, PointName.Text, (int)CategoryCombo.SelectedValue);
-                tabLabel.tabName = PointName.Text;
-
-                updater(id, PointName.Text, (int)CategoryCombo.SelectedValue);
+                if (PointName.Text == origName)
+                {
+                    isDirty = (int)CategoryCombo.SelectedValue != origType;
+                    if (!isDirty)
+                    {
+                        SavePointButton.IsEnabled = false;
+                        CancelPointButton.IsEnabled = false;
+                    }
+                    return;
+                }
+                isDirty = true;
+                CancelPointButton.IsEnabled = true;
+                if (PointName.Text.Length > 0)
+                {
+                    NameError.Visibility = Visibility.Hidden;
+                    SavePointButton.IsEnabled = true;
+                }
+                else
+                {
+                    NameError.Visibility = Visibility.Visible;
+                    SavePointButton.IsEnabled = false;
+                }
             }
         }
 
         private void PointName_LostFocus(object sender, RoutedEventArgs e)
         {
+            if (PointName.Text == origName)
+            {
+                isDirty = (int)CategoryCombo.SelectedValue != origType;
+                if (!isDirty)
+                {
+                    SavePointButton.IsEnabled = false;
+                    CancelPointButton.IsEnabled = false;
+                }
+                return;
+            }
+            isDirty = true;
+            CancelPointButton.IsEnabled = true;
+            if (PointName.Text.Length > 0)
+            {
+                NameError.Visibility = Visibility.Hidden;
+                SavePointButton.IsEnabled = true;
+            }
+            else
+            {
+                NameError.Visibility = Visibility.Visible;
+                SavePointButton.IsEnabled = false;
+            }
+        }
+        private void SavePointButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (isDirty)
+            {
+                SavePoint();
+                SavePointButton.IsEnabled = false;
+                CancelPointButton.IsEnabled = false;
+                isDirty = false;
+            }
+        }
+
+        void SavePoint()
+        {
             DatabaseHandler.ChangePoint(id, PointName.Text, (int)CategoryCombo.SelectedValue);
             tabLabel.tabName = PointName.Text;
 
             updater(id, PointName.Text, (int)CategoryCombo.SelectedValue);
+
+            origName = PointName.Text;
+            origType = (int)CategoryCombo.SelectedValue;
+        }
+
+        private void CancelPointButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (isDirty)
+            {
+                PointName.Text = origName;
+                CategoryCombo.SelectedValue = origType;
+                SavePointButton.IsEnabled = false;
+                CancelPointButton.IsEnabled = false;
+                isDirty = false;
+            }
         }
 
         //trying to dispose and free memory
@@ -259,7 +351,7 @@ namespace PointDocuments
         {
             if (!Disposed)
             {
-                docPoint.Clear();
+               /* docPoint.Clear();
                 foreach (var table in typeToTable)
                 {
                     table.Value.ItemsSource = null;
@@ -273,9 +365,37 @@ namespace PointDocuments
 
                 pointTypes.Clear();
                 updater = null;
-                Content = null;
+                Content = null;*/
             }
             Disposed = true;
+        }
+
+        public bool CloseTab()
+        {
+            if (!isDirty)
+            {
+                return true;
+            }
+            MessageBoxResult result;
+            if (PointName.Text.Length > 0)
+            {
+                result = MessageBox.Show("Сохранить все изменения точки?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Exclamation);
+            }
+            else
+            {
+                result = MessageBox.Show("Невозможно сохранить изменения точки. Продолжить?", "Внимание", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
+            }
+
+            switch (result)
+            {
+                case MessageBoxResult.Cancel:
+                    return false;
+                    break;
+                case MessageBoxResult.Yes:
+                    SavePoint();
+                    break;
+            }
+            return true;
         }
     }
 }

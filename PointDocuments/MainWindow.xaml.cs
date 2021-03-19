@@ -18,14 +18,18 @@ namespace PointDocuments
     public partial class MainWindow : Window
     {
         PointsPage pointsPage;
+        DocumentsPage page;
 
         bool wasInitialized;
         TypesPage typesPage;
+
+        List<TabItem> tabs;
 
         public MainWindow()
         {
             InitializeComponent();
             wasInitialized = false;
+            //TabCheckBox.IsChecked = Properties.Settings.Default.isUsingTabs;
         }
 
         private void Window_Activated(object sender, EventArgs e)
@@ -54,8 +58,8 @@ namespace PointDocuments
             else
             {
                 //puts window into full screen
-                Height = 675;
-                Width = 1200;
+                Height = Util.Height;
+                Width = Util.Width;
                 Top = (SystemParameters.PrimaryScreenHeight - Height) / 2;
                 Left = (SystemParameters.PrimaryScreenWidth - Width) / 2;
                 Visibility = Visibility.Visible;
@@ -76,7 +80,7 @@ namespace PointDocuments
                 typesPage = new TypesPage();
                 TypesFrame.Content = typesPage;
 
-                DocumentsPage page = new DocumentsPage();
+                page = new DocumentsPage();
                 typesPage.updateDocumentTypesHandler += page.UpdateDocumentType;
                 DocumentsFrame.Content = page;
                 
@@ -96,6 +100,7 @@ namespace PointDocuments
             Tabs.Items.Add(newTab);
             Tabs.SelectedIndex = Tabs.Items.Count - 1;
             typesPage.updatePointTypesHandler += pointView.UpdatePointTypes;
+            page.updaterOfPoints += pointView.UpdateCategories;
         }
 
 
@@ -108,6 +113,7 @@ namespace PointDocuments
             //TODO: CHECK IF SAVED
             Tabs.Items.Remove(removeTab);
             typesPage.updatePointTypesHandler += pointView.UpdatePointTypes;
+            page.updaterOfPoints -= pointView.UpdateCategories;
         }
 
         public void OpenTab(int index)
@@ -120,5 +126,11 @@ namespace PointDocuments
             return Tabs.Items.Count >= Util.maxTabs + Util.startingTabsCount;
         }
 
+        private void TabCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.isUsingTabs = ((CheckBox)sender).IsChecked == true;
+
+            //TRANSFORM
+        }
     }
 }
